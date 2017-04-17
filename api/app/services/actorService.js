@@ -32,7 +32,7 @@ var getActorByName = function (_name) {
 
 var createActor = function (_name, _age, _gender, _agent, _agency) {
     var actorId = 1;
-    return Actor.findOne({}, {}, { sort: { 'created_at': -1 } }, function (err, post) {
+    return Actor.findOne().sort({ field: 'asc', _id: -1 }).limit(1).exec(function (err, post) {
         var lastDoc = post;
         if (lastDoc != null) {
             actorId = parseInt(lastDoc.actor_id) + 1;

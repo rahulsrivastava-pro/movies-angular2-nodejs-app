@@ -92,6 +92,9 @@ module.exports = function(app) {
     //4. director
     require('./director.js')(apiRoutes);
 
+    //5. associations
+    require('./associations.js')(apiRoutes);
+
 
     // route to show a random message (GET http://localhost:4000/api/)
 

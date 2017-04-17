@@ -32,7 +32,7 @@ var getDirectorByName = function (_name) {
 
 var createDirector = function (_name, _age, _gender) {
     var directorId = 1;
-    return Director.findOne({}, {}, { sort: { 'created_at': -1 } }, function (err, post) {
+    return Director.findOne().sort({ field: 'asc', _id: -1 }).limit(1).exec(function (err, post) {
         var lastDoc = post;
         if (lastDoc != null) {
             directorId = parseInt(lastDoc.director_id) + 1;

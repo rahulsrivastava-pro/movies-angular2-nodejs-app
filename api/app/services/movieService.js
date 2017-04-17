@@ -32,7 +32,7 @@ var getMovieByName = function (_name) {
 
 var createMovie = function (_name, _description, _year, _rating) {
     var movieId = 1;
-    return Movie.findOne({}, {}, { sort: { 'created_at': -1 } }, function (err, post) {
+    return Movie.findOne().sort({ field: 'asc', _id: -1 }).limit(1).exec(function (err, post) {
             var lastDoc = post;
             if (lastDoc != null) {
                 movieId = parseInt(lastDoc.movie_id) + 1;
