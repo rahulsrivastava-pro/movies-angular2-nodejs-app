@@ -27,7 +27,7 @@ const routing = RouterModule.forRoot([
     { path: 'order', component: OrderComponent },
     {
         path: 'movies',
-        component: MovieComponent
+        component: OrderComponent
     },
     {
         path: 'movies/:id/view',
