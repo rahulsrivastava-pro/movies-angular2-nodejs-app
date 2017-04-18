@@ -1,0 +1,344 @@
+<div class="card" *ngIf="isDataLoading==true">
+    <h4 class="card-header">Loading...</h4>
+    <div class="card-block text-xs-center">
+        <i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
+    </div>
+</div>
+
+<div class="row hidden-xs-down">
+    <h1 class="shopping-head"> YOUR SHOPPING BAG </h1>
+</div>
+
+<div *ngIf="isDataLoading==false && selectedproducts.length==0" class="row center prod-name" style="text-align:center"> You have no item in your Bag. Please select products from the <a routerlink="/" href="/"> dashboard</a>.</div>
+
+
+<div class="row vspace" *ngIf="isDataLoading==false && selectedproducts.length>0">
+
+    <div class="col-md-12 col-xs-12 header-border hidden-xs-down">
+        <div class=" row">
+            <div class="col-md-3"> {{selectedproducts.length}} ITEMS</div>
+            <div class="col-md-9">
+                <div class="col-md-6"> </div>
+                <div class="col-md-2 cell-size"> SIZE </div>
+                <div class="col-md-2 cell-qty"> QTY </div>
+                <div class="col-md-2"> PRICE </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-12 header-border-alt hidden-md-up">
+        <div class="row">
+            <div class="col-xs-9 bold-text" style="text-align:left;padding-left:36px;font-size:18px;">
+                YOUR SHOPPING BAG
+            </div>
+            <div class="col-xs-3" style="text-align:right"> {{selectedproducts.length}} ITEMS</div>
+        </div>
+    
+    </div>
+
+        <div class="col-md-12 col-xs-12 rowCover" *ngFor="let product of selectedproducts; let index=index; let odd=odd; let even=even;" [ngClass]="{ odd: odd, even: even }">
+            
+            <div class="row rowBorder hidden-xs-down" *ngIf="product.info">
+                <div class="col-md-3"><img src="/assets/{{product.info.p_image}}" /></div>
+                <div class="col-md-9">
+
+                    <div class="row">
+                        <div class="col-md-6 prod-name"> {{product.info.p_variation | uppercase}} {{product.info.p_name | uppercase}} </div>
+
+                        <div class="col-md-2 prod-size"> {{product.p_sizecode | uppercase}} </div>
+                        <div class="col-md-2 prod-qty"> <input type="text" [value]="product.p_quantity" readonly="readonly" class="input-qty" /> </div>
+                        <div class="col-md-2 price-text"> <span class="prod-currency">{{product.info.p_currency}}</span> <span class="price-value">{{product.info.p_originalprice}}</span></div>
+                    </div>
+                    <div class="row prod-style">
+                        Style #: {{product.info.p_style | uppercase}}
+                    </div>
+                    <div class="row prod-style">
+                        Colour: {{getColorByCode(product.p_colorcode) | titleCase}}
+                    </div>
+                    <div class="row prod-action">
+                        <a id="neworder" title="Edit Product" (click)="modal.open();loadProduct(product);" class="link">Edit</a> | <a id="neworder" (click)="deleteProduct(product);" class="link" title="Remove Product"> <i class="fa fa-remove"></i> REMOVE</a> | <a title="To Be Implemented" id="neworder" class="link">SAVE FOR LATER</a>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row rowBorder-alt hidden-md-up" *ngIf="product.info">
+                <div class="row">
+                    <div class="col-xs-6"><img src="/assets/{{product.info.p_image}}" /></div>
+                    <div class="col-xs-6">
+
+                        <div class="row">
+                            <div class="col-xs-12 prod-name-alt"> {{product.info.p_variation | uppercase}} </div>
+                            <div class="col-xs-12 prod-name-alt"> {{product.info.p_name | uppercase}} </div>
+                            <div class="col-xs-12 prod-info"> Style #: {{product.info.p_style | uppercase}} </div>
+                            <div class="col-xs-12 prod-info"> Colour: {{getColorByCode(product.p_colorcode) | titleCase}} </div>
+                            <div class="col-xs-12 prod-info"> Size: {{product.p_sizecode | uppercase}} </div>
+                            <div class="col-xs-12 prod-qty-alt"> QTY: <input type="text" [value]="product.p_quantity" readonly="readonly" class="input-qty" /> </div>
+                            <div class="col-xs-12 price-text-alt"> <span class="prod-currency-alt">{{product.info.p_currency}}</span> <span class="price-value">{{product.info.p_originalprice}}</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row prod-action-alt col-xs-12">
+                    <a id="neworder" title="Edit Product" (click)="modal.open();loadProduct(product);" class="link">Edit</a> | <a id="neworder" (click)="deleteProduct(product);" class="link" title="Remove Product"> <i class="fa fa-remove"></i> REMOVE</a> | <a title="To Be Implemented" id="neworder" class="link">SAVE FOR LATER</a>
+                </div>
+            </div>
+            
+        </div>
+
+    </div>
+
+    <app-toast [message]="toast.message"></app-toast>
+
+<div class="row">
+    <div class="col-md-3 hidden-xs-down">
+        <div class="row side-text-1">
+            Need Help <br />
+            or have questions?
+        </div>
+
+        <div class="row side-text-2">
+            Call Customer Service at <br />
+            1-800-555-5555
+        </div>
+
+        <div class="row side-text-3">
+            Chat with one of <br />
+            our stylists
+        </div>
+
+        <div class="row side-text-3">
+            See return <br />
+            &amp; exchange policy
+        </div>
+    </div>
+
+    <div class="col-md-9" *ngIf="selectedproducts.length>0">
+        <div class="row dvPromotion">
+            <div class="col-md-6 bold-text centered col-xs-12">
+                ENTER PROMOTION CODE <br />
+                OR GIFT CARD
+            </div>
+            <div class="col-md-6 centered col-xs-12 extra-pad">
+                <input type="text" class="txtPromotion" /> <button type="button" class="btnApply"> APPLY</button>
+
+            </div>
+        </div>
+        <div class="row price-row">
+            <div class="col-md-7 col-xs-7 bold-text"> SUBTOTAL </div>
+            <div class="col-md-5 col-xs-5  lbl-amount price-text">
+                <span class="prod-currency">$</span>
+                <span class="price-value price-margin">{{amount.subTotal}}</span>
+            </div>
+        </div>
+        <div class="row price-row-2" *ngIf="amount.enableDiscount">
+            <div class="col-md-7 bold-text col-xs-7"> PROMOTION CODE <b>JF10</b> APPLIED </div>
+            <div class="col-md-5 col-xs-5 lbl-amount price-text">
+                <span> - </span>
+                <span class="prod-currency">$</span>
+                <span class="price-value price-margin">{{amount.discount}}</span>
+            </div>
+        </div>
+        <div class="row price-row-2">
+            <div class="col-md-7 col-xs-7">
+                <span class="bold-text">ESTIMATED SHIPPING * </span><br />
+                <span class="light-text" *ngIf="amount.enableFreeShipping">
+                    You qualify for free shipping <br />
+                    because your order is over $50*
+                </span>
+            </div>
+            <div class="col-md-5 col-xs-5 lbl-amount price-text" *ngIf="!amount.enableFreeShipping">
+                <span class="prod-currency">$</span>
+                <span class="price-value price-margin">{{amount.shippingPrice}}</span>
+            </div>
+            <div class="col-md-5 col-xs-5 free" *ngIf="amount.enableFreeShipping">
+                <span class="bold-text">FREE</span>
+            </div>
+        </div>
+
+        <div class="row price-row-3">
+            <div class="col-md-7 col-xs-7">
+                <span class="bolder-text">ESTIMATED TOTAL </span> <br />
+                <span class="light-text">
+                    Tax will be applied during checkout
+                </span>
+
+            </div>
+            <div class="col-md-5 col-xs-5 lbl-amount price-text-bold">
+                <span class="prod-currency">$</span>
+                <span class="price-value price-margin">{{amount.netAmount}}</span>
+            </div>
+        </div> 
+
+        <div class="row price-row-2 row-swap">
+            <div class="col-md-10 continue-shopping col-xs-12 centered top-margin"> <a routerlink="/" href="/"> CONTINUE SHOPPING</a> </div>
+            <div class="col-md-2 col-xs-12 centered"> <button class="btn-primary btn broad" onclick="javascript:void()"> CHECKOUT</button> </div>
+        </div>
+
+        <div class="row price-row-2 row-swap">
+            <div class="col-md-8 align-right col-xs-12 centered">
+                <img src="/assets/lock.jpg" />
+            </div>
+            <div class="col-md-4 light-text bottom-text col-xs-12 centered">
+                 Secure checkout. Shopping is always safe &amp; secure.
+            </div>
+        </div>
+
+        <div class="row hidden-md-up top-border light-text centered extra-pad" style="margin-top:10px">
+            <span> SIGN IN </span> to you cart and have access to your items on mobile, tablet and desktop.
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row vspace col-xs-12 colmd-12 align-center">
+    Powered By <a href="https://github.com/rahul-openstack">Rahul Srivastava</a>
+</div>
+
+    <modal #modal>
+        <style type="text/css">
+
+
+        @media (min-width: 768px) {
+            .modal-prod-name{
+            text-align: center;
+            }
+            
+        .modal-name{
+            color: #b2b2b2;
+            font-size: 15px;
+            font-weight: 700;
+            margin-left: -14px;
+            text-align: center;
+            margin-bottom:5px;
+            border-top: 5px solid #e1e1e1;
+            padding-top:13px;
+        }
+        }
+
+
+        @media (max-width: 767px) {
+            .modal-prod-name{
+            text-align: center;
+            font-size:16px;
+            }
+
+            
+            .modal-name{
+                color: #b2b2b2;
+                font-size: 10px;
+                font-weight: 700;
+                margin-left: -14px;
+                text-align: center;
+                margin-bottom:5px;
+                border-top: 5px solid #e1e1e1;
+                padding-top:13px;
+            }
+
+            .modal-content{
+                width:317px !important;
+            }
+        }
+
+        
+
+        
+        .modal-price-value{
+            padding: 0;
+            vertical-align: text-bottom;
+        }
+
+        .modal-price-text{
+            color: #808080;
+            font-size: 50px;
+            font-weight: 600;
+            padding: 0 0 0 5px;
+            text-align:center;
+            margin-bottom:5px;
+        }
+
+        .modal-prod-currency{
+            color: #808080;
+            font-size: 38px;
+            font-weight: 500;
+            vertical-align:text-top;
+        }
+
+        .modal-table{
+            width:100%;
+            height:300px!important;
+        }
+
+        .modal-light-text{
+             color: #808080;
+            font-size: 11px;
+            font-weight: 400;
+            text-align:center;
+            text-decoration:underline;
+        }
+
+        .modal-center{
+            text-align:center;
+            margin-bottom:15px;
+        }
+            
+        .modal-box {
+                display: inline-block;
+            height: 18px;
+            margin-left: 10px;
+            width: 34px;
+        }
+        .modal-box-big {
+                display: inline-block;
+            height: 24px;
+            margin-left: 10px;
+            width: 39px;
+        }
+        </style>
+        <modal-header [show-close]="true">
+            
+        </modal-header>
+        <modal-body>
+          
+                <table class="modal-table">
+                    <tr>
+                        <td>
+                        
+                            <div class="modal-prod-name"> <span class="modal-name">{{ modalname | uppercase }}</span></div>
+                           
+                            <div class="modal-price-text"><span class="modal-prod-currency"> $</span> <span class="modal-price-value"> {{ productprice }}</span> </div>
+                            <div class="modal-center">
+                                <div *ngFor="let color of colors" style="display:inline-block;">
+                                    <a id="prod-{{color.name}}" (click)="selectColor(color.hexcode)"><div class="modal-box" [style.background-color]="color.hexcode" class="{{productColor==color.hexcode ? 'modal-box-big' : 'modal-box'}}"></div></a>
+                                </div>
+                            </div>
+                            <div class="modal-center">
+                                <select [(ngModel)]="productSize" (ngModelChange)="enableEditing(productSize,productColor)">
+                                    <option value=""></option>
+                                    <option *ngFor="let size of sizes" value={{size.code}}>Size:&nbsp;{{size.name}}</option>
+                                </select>
+
+                                Quantity:
+                                <select [(ngModel)]="productQty" (ngModelChange)="enableEditing(productSize,productColor)">
+                                    <option *ngFor="let qty of [1,2,3,4,5]" value={{qty}}>{{qty}}</option>
+                                </select>
+                            </div>
+                            <div class="modal-center"><button class="btn btn-primary" type="button" (click)="modal.close();editProduct(product)" [disabled]="!isEditing">Edit</button></div>
+                            <div class="modal-light-text">See product details</div>
+                                
+
+                        </td>
+                        <td>
+                        <div style="display:inline-block;text-align:center">
+                            <img src="/assets/{{imagepath}}" />
+                        </div></td>
+                    </tr>
+                </table>
+                
+           
+                
+        </modal-body>
+
+    </modal>
+

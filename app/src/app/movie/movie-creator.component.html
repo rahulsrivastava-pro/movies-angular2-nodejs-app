@@ -1,0 +1,19 @@
+<div class="form-group">
+  <label for="title">Title</label>
+  <input type="text" [(ngModel)]="movie.title" class="form-control" id="title" placeholder="Movie Title Here"/>
+</div>
+<div class="form-group">
+  <label for="year">Release Year</label>
+  <input type="text" [(ngModel)]="movie.releaseYear" class="form-control" id="year" placeholder="When was the movie released?"/>
+</div>
+<div class="form-group">
+  <label for="director">Director</label>
+  <input type="text" [(ngModel)]="movie.director" class="form-control" id="director" placeholder="Who directed the movie?"/>
+</div>
+<div class="form-group">
+  <label for="genre">Movie Genre</label>
+  <input type="text" [(ngModel)]="movie.genre" class="form-control" id="genre" placeholder="Movie genre here"/>
+</div>
+<div class="form-group">
+  <input (click)="saveMovie()" type="submit" class="btn btn-primary" value="Save Movie"/>
+</div>

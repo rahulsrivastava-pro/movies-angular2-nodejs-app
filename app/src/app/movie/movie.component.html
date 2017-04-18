@@ -1,0 +1,15 @@
+<h2>Overview of Movies</h2>
+<br>
+<table class="table">
+  <tr *ngFor="let movie of movies">
+    <td>{{movie.title}}</td>
+    <td align="right">
+      <a class="btn btn-primary" [routerLink]="['/movies', movie._id, 'view']">View</a>
+      <a class="btn btn-danger"  (click)="deleteMovie(movie, $event)">Delete</a>
+    </td>
+  </tr>
+</table>
+
+<p><a [routerLink]="['/movies/new']" class="btn-primary btn-lg">Add New Movie</a></p>
+
+

@@ -1,0 +1,22 @@
+<h3>Details for {{movie.title}}</h3>
+<table class="table">
+  <tr>
+    <td>Movie Title</td>
+    <td>{{movie.title}}</td>
+  </tr>
+  <tr>
+    <td>Director</td>
+    <td>{{movie.director}}</td>
+  </tr>
+  <tr>
+    <td>Release Year</td>
+    <td>{{movie.releaseYear}}</td>
+  </tr>
+  <tr>
+    <td>Movie Genre</td>
+    <td>{{movie.genre}}</td>
+  </tr>
+</table>
+<div>
+  <a class="btn btn-primary" [routerLink]="['/movies', movie._id, 'edit']">Edit</a>
+</div>

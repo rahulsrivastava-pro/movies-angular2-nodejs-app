@@ -17,6 +17,22 @@ module.exports = function (apiRoutes) {
     });
 
     apiRoutes.delete('/disassociateMovieActor/:movie_id/:actor_id', function (req, res) {
-        _associationsController.removeMovie(req, res);
+        _associationsController.removeMovieActor(req, res);
+    });
+
+    apiRoutes.get('/getDirectorsInMovie/:id', function (req, res) {
+        _associationsController.getDirectorsInMovie(req, res);
+    });
+
+    apiRoutes.get('/getMoviesByDirector/:id', function (req, res) {
+        _associationsController.getMoviesByDirector(req, res);
+    });
+
+    apiRoutes.post('/associateMovieDirector', function (req, res) {
+        _associationsController.createMovieDirector(req, res);
+    });
+
+    apiRoutes.delete('/disassociateMovieDirector/:movie_id/:director_id', function (req, res) {
+        _associationsController.removeMovieDirector(req, res);
     });
 };
