@@ -1,6 +1,5 @@
 ﻿{
     "app": {
-        "port": 3000,
         "domain": "localhost"
     },
     "db": {
