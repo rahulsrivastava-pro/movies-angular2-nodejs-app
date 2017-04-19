@@ -1,9 +1,9 @@
 {
-  "name": "shopping-cart-full-stack",
+  "name": "movies-full-stack",
   "version": "1.0.0",
   "license": "MIT",
   "author": "Rahul Srivastava",
-  "description": "Shopping cart using MEAN 2 (Angular2, Express, Node, Mongo)",
+  "description": "Movies App using MEAN 2 (Angular2, Express, Node, Mongo)",
   "angular-cli": {},
   "scripts": {
     "start": "nodemon src/server/app.js",

@@ -1,4 +1,4 @@
-# Shopping Cart Module using Angular2, Node, Express and Mongo  [![MIT license](http://img.shields.io/badge/license-MIT-lightgrey.svg)](http://opensource.org/licenses/MIT)
+# Movies-App using Angular2, Node, Express and Mongo  [![MIT license](http://img.shields.io/badge/license-MIT-lightgrey.svg)](http://opensource.org/licenses/MIT)
 
 
 The front-end of this project was generated with [Angular CLI](https://github.com/angular/angular-cli).
@@ -27,10 +27,10 @@ This project uses the [MEAN stack](https://en.wikipedia.org/wiki/MEAN_(software_
 3. Command window 2: `npm start`: run Express server
 4. Go to [localhost:8080](http://localhost:8080)
 5. Database for the application is placed on Mongo-lab. In order to connect to it, use the following connection settings from any local mongo db client (like RoboMongo):
-   `Database: ds133158.mlab.com`,
-   `Port: 33158`,
-   `Database User: rahul`,
-   `Database User's password: rahul`.		
+   `Database: ds161640.mlab.com`,
+   `Port: 61640`,
+   `Database User: admin`,
+   `Database User's password: admin`.		
 
 ## Production
 Run `ng build -prod` to create a production ready bundle.

@@ -4,7 +4,7 @@ var routes = require('require-dir')();
 var config = require('nconf');
 var User = require('../models/api_user'); // get our mongoose model
 var swaggerJSDoc = require('swagger-jsdoc');
-
+var cors = require('cors');
 
 // =======================
 // swagger api documentation ================
@@ -43,8 +43,29 @@ swaggerSpec.securityDefinitions["jsonWebToken"] = bearerDefinition;
 // =======================
 
 module.exports = function(app) {
-  'use strict';
-  
+    'use strict';
+
+    app.use(cors({ origin: '*' }));
+    // Add headers
+    app.use(function (req, res, next) {
+
+        // Website you wish to allow to connect
+        res.setHeader('Access-Control-Allow-Origin', '*');
+
+        // Request methods you wish to allow
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+        // Request headers you wish to allow
+        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+        // Set to true if you need the website to include cookies in the requests sent
+        // to the API (e.g. in case you use sessions)
+        res.setHeader('Access-Control-Allow-Credentials', true);
+
+        // Pass to next layer of middleware
+        next();
+    });
+
     // =======================
     // routes ================
     // =======================
@@ -113,6 +134,7 @@ module.exports = function(app) {
 
     // Error handler
     app.use(function (err, req, res, next) {
+
         res.status(err.status || 500);
         res.json({
             message: err.message,

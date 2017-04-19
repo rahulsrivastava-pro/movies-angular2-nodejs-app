@@ -1,0 +1,20 @@
+<br>
+<h4>Overview of Actors</h4>
+<br>
+
+<table class="table">
+  <tr>
+  <td align="right" colspan="2"> <div align="right"><a [routerLink]="['/actors/new']" class="btn-primary btn-lg">Add New Actor</a></div> </td>
+  </tr>
+  <tr *ngFor="let actor of actors">
+    <td>{{actor.name}}</td>
+    <td align="right">
+      <a class="btn btn-primary" [routerLink]="['/actors', actor.actor_id, 'view']">View</a>
+      <a class="btn btn-danger"  (click)="deleteActor(actor, $event)">Delete</a>
+    </td>
+  </tr>
+</table>
+
+
+
+

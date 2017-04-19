@@ -1,0 +1,26 @@
+<h3>Details for {{actor.name}}</h3>
+<table class="table">
+  <tr>
+    <td>Actor Name</td>
+    <td>{{actor.name}}</td>
+  </tr>
+  <tr>
+    <td>Age</td>
+    <td>{{actor.age}}</td>
+  </tr>
+  <tr>
+    <td>Gender</td>
+    <td>{{actor.gender}}</td>
+  </tr>
+  <tr>
+    <td>Agent</td>
+    <td>{{actor.agent}}</td>
+  </tr>
+  <tr>
+       <td>Agency</td>
+       <td>{{actor.agency}}</td>
+  </tr>
+</table>
+<div>
+  <a class="btn btn-primary" [routerLink]="['/actors', actor.actor_id, 'edit']">Edit</a>
+</div>

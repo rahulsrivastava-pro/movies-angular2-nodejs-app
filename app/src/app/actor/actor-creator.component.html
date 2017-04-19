@@ -1,0 +1,36 @@
+<br/>
+<h3>Details for Actor</h3>
+<div class="form-group">
+<div *ngIf="isError" style="text-align:left;padding-left:10px;font-size:14px;color:red;"> {{errorMessage}} </div>
+</div>
+<div class="form-group">
+  <label for="title">Actor Name</label>
+  <input type="text" [(ngModel)]="actor.name" class="form-control" id="title" placeholder="Actor Name Here"/>
+</div>
+<div class="form-group">
+  <label for="year">Age</label>
+    <input type="text" [(ngModel)]="actor.age" class="form-control" id="age" placeholder="When was the actor released?" />
+</div>
+<div class="form-group">
+  <label for="director">Gender</label>
+    <div *ngFor="let gender of genders">
+        <label>
+            <input type="radio" name="gender" [(ngModel)]="actor.gender"
+                   [value]="gender.value">
+            {{gender.display}}
+        </label>
+    </div>
+
+</div>
+<div class="form-group">
+  <label for="genre">Agent</label>
+    <input type="text" [(ngModel)]="actor.agent" class="form-control" id="agent" placeholder="Agent" />
+</div>
+<div class="form-group">
+    <label for="genre">Agency</label>
+    <input type="text" [(ngModel)]="actor.agency" class="form-control" id="agency" placeholder="Agency" />
+</div>
+
+<div class="form-group">
+  <input (click)="saveActor()" type="submit" class="btn btn-primary" value="Save Actor"/>
+</div>

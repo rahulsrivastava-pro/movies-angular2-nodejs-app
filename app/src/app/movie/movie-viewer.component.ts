@@ -15,7 +15,10 @@ export class MovieViewerComponent implements OnInit {
   ngOnInit() {
     let id = this.route.params.forEach((params : Params) => {
       let id = +params['id'];
-      this.movieDataService.getMovie(id).then(movie => this.movie = movie);
+      this.movieDataService.getMovie(id).then(movie => 
+      {this.movie = movie;
+        //debugger;
+        });
     });
   }
 }

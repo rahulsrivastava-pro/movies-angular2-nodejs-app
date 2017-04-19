@@ -11873,7 +11873,6 @@ function _hasInvalidParent(parent) {
 /* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__src_index__["a"]; });
 /* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__src_index__["b"]; });
 /* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "c", function() { return __WEBPACK_IMPORTED_MODULE_0__src_index__["c"]; });
-/* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "d", function() { return __WEBPACK_IMPORTED_MODULE_0__src_index__["d"]; });
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -13071,6 +13070,7 @@ var RouterConfigLoader = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(91);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_toPromise__ = __webpack_require__(685);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_toPromise___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_toPromise__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__user__ = __webpack_require__(709);
 /* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return MovieDataService; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -13084,33 +13084,55 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var MovieDataService = (function () {
     function MovieDataService(http) {
         this.http = http;
-        this.moviesUrl = 'http://movieapp-sitepointdemos.rhcloud.com/api/movies';
+        this.authUrl = 'http://localhost:4000/api/authenticate';
+        this.moviesUrl = 'http://localhost:4000/api/movie';
+        this.user = new __WEBPACK_IMPORTED_MODULE_3__user__["a" /* User */]();
     }
-    MovieDataService.prototype.getMovies = function () {
-        return this.http.get(this.moviesUrl).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
-    };
-    MovieDataService.prototype.getMovie = function (id) {
-        return this.getMovies().then(function (movies) { return movies.find(function (movie) { return movie._id === id; }); });
-    };
-    MovieDataService.prototype.post = function (movie) {
+    MovieDataService.prototype.getToken = function () {
+        this.user.name = "rahul";
+        this.user.password = "srivastava";
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]({ 'Content-Type': 'application/json' });
-        return this.http.post(this.moviesUrl, JSON.stringify(movie), { headers: headers }).toPromise().then(function (res) { return res.json().data; }).catch(this.handleError);
+        return this.http.post(this.authUrl, JSON.stringify(this.user), { headers: headers }).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
     };
-    MovieDataService.prototype.put = function (movie) {
+    MovieDataService.prototype.getMovies = function () {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
         headers.append('Content-Type', 'application/json');
-        var url = this.moviesUrl + "/" + movie._id;
+        headers.append('x-access-token', currentUser.token);
+        return this.http.get(this.moviesUrl, { headers: headers }).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
+    };
+    MovieDataService.prototype.getMovie = function (id) {
+        return this.getMovies().then(function (movies) { return movies.find(function (movie) { return movie.movie_id == id; }); });
+    };
+    MovieDataService.prototype.post = function (movie) {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('x-access-token', currentUser.token);
+        return this.http.post(this.moviesUrl, JSON.stringify(movie), { headers: headers }).toPromise().then(function (res) { return res.status == 201; }).catch(this.handleError);
+    };
+    MovieDataService.prototype.put = function (movie) {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('x-access-token', currentUser.token);
+        var url = this.moviesUrl + "/" + movie.movie_id;
         return this.http.put(url, JSON.stringify(movie), { headers: headers }).toPromise().then(function () { return movie; }).catch(this.handleError);
     };
     MovieDataService.prototype.delete = function (movie) {
-        var url = this.moviesUrl + "/" + movie._id;
-        return this.http.delete(url).toPromise().catch(this.handleError);
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('x-access-token', currentUser.token);
+        var url = this.moviesUrl + "/" + movie.movie_id;
+        return this.http.delete(url, { headers: headers }).toPromise().catch(this.handleError);
     };
     MovieDataService.prototype.save = function (movie) {
-        if (movie._id) {
+        if (movie.movie_id) {
             return this.put(movie);
         }
         else {
@@ -13123,7 +13145,7 @@ var MovieDataService = (function () {
     };
     MovieDataService = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Injectable"])(), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */]) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Http */]) === 'function' && _a) || Object])
     ], MovieDataService);
     return MovieDataService;
     var _a;
@@ -26528,7 +26550,6 @@ var NgZone = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_forms__ = __webpack_require__(466);
 /* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__src_forms__["a"]; });
 /* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__src_forms__["b"]; });
-/* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "c", function() { return __WEBPACK_IMPORTED_MODULE_0__src_forms__["c"]; });
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28972,82 +28993,7 @@ var TreeNode = (function () {
 //# sourceMappingURL=tree.js.map
 
 /***/ },
-/* 206 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__ = __webpack_require__(372);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_map__);
-/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return DataService; });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-
-
-var DataService = (function () {
-    function DataService(http) {
-        this.http = http;
-        this.headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
-        this.options = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* RequestOptions */]({ headers: this.headers });
-    }
-    //getCats() {
-    //  return this.http.get('/cats').map(res => res.json());
-    //}
-    //addCat(cat) {
-    //  return this.http.post("/cat", JSON.stringify(cat), this.options);
-    //}
-    //editCat(cat) {
-    //  return this.http.put(`/cat/${cat._id}`, JSON.stringify(cat), this.options);
-    //}
-    //deleteCat(cat) {
-    //  return this.http.delete(`/cat/${cat._id}`, this.options);
-    //}
-    DataService.prototype.getColors = function () {
-        return this.http.get('/colors').map(function (res) { return res.json(); });
-    };
-    DataService.prototype.getSizes = function () {
-        return this.http.get('/sizes').map(function (res) { return res.json(); });
-    };
-    DataService.prototype.getProducts = function () {
-        return this.http.get('/products').map(function (res) { return res.json(); });
-    };
-    DataService.prototype.getProductById = function (p_id) {
-        return this.http.get('/products/${p_id}').map(function (res) { return res.json(); });
-    };
-    DataService.prototype.getSelectedProducts = function () {
-        return this.http.get('/selectedproducts').map(function (res) { return res.json(); });
-    };
-    DataService.prototype.addProduct = function (product) {
-        return this.http.post("/selectedproducts", JSON.stringify(product), this.options);
-    };
-    DataService.prototype.editProduct = function (product) {
-        return this.http.post("/updateselectedproducts", JSON.stringify(product), this.options);
-    };
-    DataService.prototype.deleteProduct = function (product) {
-        return this.http.post("/deleteselectedproducts", JSON.stringify(product), this.options);
-    };
-    DataService.prototype.getTotal = function () {
-        return this.http.get('/calculateTotal').map(function (res) { return res.json(); });
-    };
-    DataService = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Injectable"])(), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */]) === 'function' && _a) || Object])
-    ], DataService);
-    return DataService;
-    var _a;
-}());
-
-
-/***/ },
+/* 206 */,
 /* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -44368,7 +44314,7 @@ var ModalResult = exports.ModalResult;
 /* 370 */
 /***/ function(module, exports) {
 
-module.exports = "<div class=\"form-group\">\r\n  <label for=\"title\">Title</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.title\" class=\"form-control\" id=\"title\" placeholder=\"Movie Title Here\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"year\">Release Year</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.releaseYear\" class=\"form-control\" id=\"year\" placeholder=\"When was the movie released?\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"director\">Director</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.director\" class=\"form-control\" id=\"director\" placeholder=\"Who directed the movie?\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"genre\">Movie Genre</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.genre\" class=\"form-control\" id=\"genre\" placeholder=\"Movie genre here\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <input (click)=\"saveMovie()\" type=\"submit\" class=\"btn btn-primary\" value=\"Save Movie\"/>\r\n</div>"
+module.exports = "<br/>\r\n<h3>Details for Movie</h3>\r\n<div class=\"form-group\">\r\n<div *ngIf=\"isError\" style=\"text-align:left;padding-left:10px;font-size:14px;color:red;\"> {{errorMessage}} </div>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"title\">Title</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.name\" class=\"form-control\" id=\"title\" placeholder=\"Movie Title Here\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"year\">Release Year</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.year\" class=\"form-control\" id=\"year\" placeholder=\"When was the movie released?\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"director\">Description</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.description\" class=\"form-control\" id=\"director\" placeholder=\"Description of the movie?\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"genre\">Rating</label>\r\n  <input type=\"text\" [(ngModel)]=\"movie.rating\" class=\"form-control\" id=\"genre\" placeholder=\"Rating\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <input (click)=\"saveMovie()\" type=\"submit\" class=\"btn btn-primary\" value=\"Save Movie\"/>\r\n</div>"
 
 /***/ },
 /* 371 */
@@ -54503,7 +54449,7 @@ var ReactiveFormsModule = (function () {
 /* unused harmony reexport MinLengthValidator */
 /* unused harmony reexport PatternValidator */
 /* unused harmony reexport RequiredValidator */
-/* harmony reexport (binding) */ __webpack_require__.d(exports, "a", function() { return __WEBPACK_IMPORTED_MODULE_19__form_builder__["a"]; });
+/* unused harmony reexport FormBuilder */
 /* unused harmony reexport AbstractControl */
 /* unused harmony reexport FormArray */
 /* unused harmony reexport FormControl */
@@ -54511,8 +54457,8 @@ var ReactiveFormsModule = (function () {
 /* unused harmony reexport NG_ASYNC_VALIDATORS */
 /* unused harmony reexport NG_VALIDATORS */
 /* unused harmony reexport Validators */
-/* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "b", function() { return __WEBPACK_IMPORTED_MODULE_22__form_providers__["a"]; });
-/* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "c", function() { return __WEBPACK_IMPORTED_MODULE_22__form_providers__["b"]; });
+/* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "a", function() { return __WEBPACK_IMPORTED_MODULE_22__form_providers__["a"]; });
+/* harmony namespace reexport (by used) */ __webpack_require__.d(exports, "b", function() { return __WEBPACK_IMPORTED_MODULE_22__form_providers__["b"]; });
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -54870,7 +54816,7 @@ var JsonpModule = (function () {
 /* unused harmony reexport XHRBackend */
 /* unused harmony reexport XHRConnection */
 /* unused harmony reexport BaseRequestOptions */
-/* harmony reexport (binding) */ __webpack_require__.d(exports, "b", function() { return __WEBPACK_IMPORTED_MODULE_3__base_request_options__["a"]; });
+/* unused harmony reexport RequestOptions */
 /* unused harmony reexport BaseResponseOptions */
 /* unused harmony reexport ResponseOptions */
 /* unused harmony reexport ReadyState */
@@ -54878,9 +54824,9 @@ var JsonpModule = (function () {
 /* unused harmony reexport ResponseContentType */
 /* unused harmony reexport ResponseType */
 /* harmony reexport (binding) */ __webpack_require__.d(exports, "a", function() { return __WEBPACK_IMPORTED_MODULE_6__headers__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(exports, "c", function() { return __WEBPACK_IMPORTED_MODULE_7__http__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(exports, "b", function() { return __WEBPACK_IMPORTED_MODULE_7__http__["a"]; });
 /* unused harmony reexport Jsonp */
-/* harmony reexport (binding) */ __webpack_require__.d(exports, "d", function() { return __WEBPACK_IMPORTED_MODULE_8__http_module__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(exports, "c", function() { return __WEBPACK_IMPORTED_MODULE_8__http_module__["a"]; });
 /* unused harmony reexport JsonpModule */
 /* unused harmony reexport Connection */
 /* unused harmony reexport ConnectionBackend */
@@ -57597,16 +57543,19 @@ function getResolve(route) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__angular_http__ = __webpack_require__(91);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__angular_router__ = __webpack_require__(136);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__app_component__ = __webpack_require__(328);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__dashboard_dashboard_component__ = __webpack_require__(497);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__order_order_component__ = __webpack_require__(503);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__services_data_service__ = __webpack_require__(206);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__services_titlecase_pipe__ = __webpack_require__(504);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__movie_movie_component__ = __webpack_require__(502);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__movie_movie_viewer_component__ = __webpack_require__(501);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__movie_movie_editor_component__ = __webpack_require__(500);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__movie_movie_creator_component__ = __webpack_require__(499);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__shared_movie_data_service__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__shared_toast_toast_component__ = __webpack_require__(208);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_titlecase_pipe__ = __webpack_require__(504);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_titlecase_pipe___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7__services_titlecase_pipe__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__movie_movie_component__ = __webpack_require__(502);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__movie_movie_viewer_component__ = __webpack_require__(501);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__movie_movie_editor_component__ = __webpack_require__(500);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__movie_movie_creator_component__ = __webpack_require__(499);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__shared_movie_data_service__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__actor_actor_component__ = __webpack_require__(716);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__actor_actor_viewer_component__ = __webpack_require__(715);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__actor_actor_editor_component__ = __webpack_require__(714);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__actor_actor_creator_component__ = __webpack_require__(713);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__shared_actor_data_service__ = __webpack_require__(710);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__shared_toast_toast_component__ = __webpack_require__(208);
 /* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return AppModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -57634,25 +57583,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
+
 var routing = __WEBPACK_IMPORTED_MODULE_5__angular_router__["c" /* RouterModule */].forRoot([
-    { path: '', component: __WEBPACK_IMPORTED_MODULE_7__dashboard_dashboard_component__["a" /* DashboardComponent */] },
-    { path: 'order', component: __WEBPACK_IMPORTED_MODULE_8__order_order_component__["a" /* OrderComponent */] },
-    {
-        path: 'movies',
-        component: __WEBPACK_IMPORTED_MODULE_8__order_order_component__["a" /* OrderComponent */]
-    },
-    {
-        path: 'movies/:id/view',
-        component: __WEBPACK_IMPORTED_MODULE_12__movie_movie_viewer_component__["a" /* MovieViewerComponent */]
-    },
-    {
-        path: 'movies/:id/edit',
-        component: __WEBPACK_IMPORTED_MODULE_13__movie_movie_editor_component__["a" /* MovieEditorComponent */]
-    },
-    {
-        path: 'movies/new',
-        component: __WEBPACK_IMPORTED_MODULE_14__movie_movie_creator_component__["a" /* MovieCreatorComponent */]
-    }
+    { path: '', component: __WEBPACK_IMPORTED_MODULE_8__movie_movie_component__["a" /* MovieComponent */] },
+    { path: 'movies', component: __WEBPACK_IMPORTED_MODULE_8__movie_movie_component__["a" /* MovieComponent */] },
+    { path: 'movies/:id/view', component: __WEBPACK_IMPORTED_MODULE_9__movie_movie_viewer_component__["a" /* MovieViewerComponent */] },
+    { path: 'movies/:id/edit', component: __WEBPACK_IMPORTED_MODULE_10__movie_movie_editor_component__["a" /* MovieEditorComponent */] },
+    { path: 'movies/new', component: __WEBPACK_IMPORTED_MODULE_11__movie_movie_creator_component__["a" /* MovieCreatorComponent */] },
+    { path: 'actors', component: __WEBPACK_IMPORTED_MODULE_13__actor_actor_component__["a" /* ActorComponent */] },
+    { path: 'actors/:id/view', component: __WEBPACK_IMPORTED_MODULE_14__actor_actor_viewer_component__["a" /* ActorViewerComponent */] },
+    { path: 'actors/:id/edit', component: __WEBPACK_IMPORTED_MODULE_15__actor_actor_editor_component__["a" /* ActorEditorComponent */] },
+    { path: 'actors/new', component: __WEBPACK_IMPORTED_MODULE_16__actor_actor_creator_component__["a" /* ActorCreatorComponent */] }
 ]);
 var AppModule = (function () {
     function AppModule() {
@@ -57661,27 +57603,29 @@ var AppModule = (function () {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["NgModule"])({
             declarations: [
                 __WEBPACK_IMPORTED_MODULE_6__app_component__["a" /* AppComponent */],
-                __WEBPACK_IMPORTED_MODULE_7__dashboard_dashboard_component__["a" /* DashboardComponent */],
-                __WEBPACK_IMPORTED_MODULE_8__order_order_component__["a" /* OrderComponent */],
-                __WEBPACK_IMPORTED_MODULE_11__movie_movie_component__["a" /* MovieComponent */],
-                __WEBPACK_IMPORTED_MODULE_12__movie_movie_viewer_component__["a" /* MovieViewerComponent */],
-                __WEBPACK_IMPORTED_MODULE_14__movie_movie_creator_component__["a" /* MovieCreatorComponent */],
-                __WEBPACK_IMPORTED_MODULE_13__movie_movie_editor_component__["a" /* MovieEditorComponent */],
-                __WEBPACK_IMPORTED_MODULE_16__shared_toast_toast_component__["a" /* ToastComponent */],
-                __WEBPACK_IMPORTED_MODULE_10__services_titlecase_pipe__["a" /* TitleCase */]
+                __WEBPACK_IMPORTED_MODULE_8__movie_movie_component__["a" /* MovieComponent */],
+                __WEBPACK_IMPORTED_MODULE_9__movie_movie_viewer_component__["a" /* MovieViewerComponent */],
+                __WEBPACK_IMPORTED_MODULE_11__movie_movie_creator_component__["a" /* MovieCreatorComponent */],
+                __WEBPACK_IMPORTED_MODULE_10__movie_movie_editor_component__["a" /* MovieEditorComponent */],
+                __WEBPACK_IMPORTED_MODULE_13__actor_actor_component__["a" /* ActorComponent */],
+                __WEBPACK_IMPORTED_MODULE_14__actor_actor_viewer_component__["a" /* ActorViewerComponent */],
+                __WEBPACK_IMPORTED_MODULE_16__actor_actor_creator_component__["a" /* ActorCreatorComponent */],
+                __WEBPACK_IMPORTED_MODULE_15__actor_actor_editor_component__["a" /* ActorEditorComponent */],
+                __WEBPACK_IMPORTED_MODULE_18__shared_toast_toast_component__["a" /* ToastComponent */],
+                __WEBPACK_IMPORTED_MODULE_7__services_titlecase_pipe__["TitleCase"]
             ],
             imports: [
                 __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["b" /* BrowserModule */],
-                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["b" /* FormsModule */],
-                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["c" /* ReactiveFormsModule */],
-                __WEBPACK_IMPORTED_MODULE_4__angular_http__["d" /* HttpModule */],
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormsModule */],
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["b" /* ReactiveFormsModule */],
+                __WEBPACK_IMPORTED_MODULE_4__angular_http__["c" /* HttpModule */],
                 routing,
                 __WEBPACK_IMPORTED_MODULE_3_ng2_bs4_modal_ng2_bs4_modal__["ModalModule"]
             ],
             providers: [
-                __WEBPACK_IMPORTED_MODULE_9__services_data_service__["a" /* DataService */],
-                __WEBPACK_IMPORTED_MODULE_15__shared_movie_data_service__["a" /* MovieDataService */],
-                __WEBPACK_IMPORTED_MODULE_16__shared_toast_toast_component__["a" /* ToastComponent */]
+                __WEBPACK_IMPORTED_MODULE_12__shared_movie_data_service__["a" /* MovieDataService */],
+                __WEBPACK_IMPORTED_MODULE_17__shared_actor_data_service__["a" /* ActorDataService */],
+                __WEBPACK_IMPORTED_MODULE_18__shared_toast_toast_component__["a" /* ToastComponent */]
             ],
             schemas: [__WEBPACK_IMPORTED_MODULE_1__angular_core__["CUSTOM_ELEMENTS_SCHEMA"]],
             bootstrap: [__WEBPACK_IMPORTED_MODULE_6__app_component__["a" /* AppComponent */]]
@@ -57693,112 +57637,7 @@ var AppModule = (function () {
 
 
 /***/ },
-/* 497 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__(186);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_toast_toast_component__ = __webpack_require__(208);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_data_service__ = __webpack_require__(206);
-/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return DashboardComponent; });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-
-
-
-
-var DashboardComponent = (function () {
-    function DashboardComponent(http, dataService, toast, formBuilder) {
-        this.http = http;
-        this.dataService = dataService;
-        this.toast = toast;
-        this.formBuilder = formBuilder;
-        //private cats = [];
-        this.products = [];
-        this.sizes = [];
-        this.colors = [];
-        this.isLoading = true;
-        this.product = {};
-        this.selectedproduct = {};
-        this.productSize = "";
-        this.productColor = "";
-        this.modalname = "";
-        this.imagepath = "";
-        this.productprice = "";
-        this.productQty = 1;
-        this.isEditing = false;
-    }
-    DashboardComponent.prototype.ngOnInit = function () {
-        this.getProducts();
-        this.getSizes();
-        this.getColors();
-    };
-    DashboardComponent.prototype.getProducts = function () {
-        var _this = this;
-        this.dataService.getProducts().subscribe(function (data) { return _this.products = data; }, function (error) { return console.log(error); }, function () { return _this.isLoading = false; });
-    };
-    DashboardComponent.prototype.getSizes = function () {
-        var _this = this;
-        this.dataService.getSizes().subscribe(function (data) { return _this.sizes = data; }, function (error) { return console.log(error); }, function () { return _this.isLoading = false; });
-    };
-    DashboardComponent.prototype.getColors = function () {
-        var _this = this;
-        this.dataService.getColors().subscribe(function (data) { return _this.colors = data; }, function (error) { return console.log(error); }, function () { return _this.isLoading = false; });
-    };
-    DashboardComponent.prototype.loadProduct = function (product) {
-        this.productSize = "";
-        this.productColor = "#A3D2A1";
-        this.productQty = 1;
-        this.modalname = product.p_variation + " " + product.p_name;
-        this.imagepath = product.p_image;
-        this.productprice = product.p_originalprice;
-        this.product = product;
-    };
-    DashboardComponent.prototype.selectColor = function (color) {
-        this.productColor = color;
-    };
-    DashboardComponent.prototype.addProduct = function (prod) {
-        var _this = this;
-        this.selectedproduct = { p_id: prod.p_id, p_sizecode: this.productSize, p_colorcode: this.productColor, p_quantity: this.productQty };
-        this.dataService.addProduct(this.selectedproduct).subscribe(function (res) {
-            _this.productSize = "";
-            _this.productColor = "";
-            _this.productQty = 1;
-            _this.toast.setMessage("item added successfully.", "success");
-        }, function (error) { return console.log(error); });
-    };
-    DashboardComponent.prototype.enableEditing = function (size, color) {
-        if (size != "" && color != "") {
-            this.isEditing = true;
-        }
-        else {
-            this.isEditing = false;
-        }
-    };
-    DashboardComponent = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
-            selector: 'app-dashboard',
-            template: __webpack_require__(675),
-            styles: [__webpack_require__(669)]
-        }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4__services_data_service__["a" /* DataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_4__services_data_service__["a" /* DataService */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__shared_toast_toast_component__["a" /* ToastComponent */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__shared_toast_toast_component__["a" /* ToastComponent */]) === 'function' && _c) || Object, (typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormBuilder */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormBuilder */]) === 'function' && _d) || Object])
-    ], DashboardComponent);
-    return DashboardComponent;
-    var _a, _b, _c, _d;
-}());
-
-
-/***/ },
+/* 497 */,
 /* 498 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -57839,10 +57678,32 @@ var MovieCreatorComponent = (function () {
         this.router = router;
         this.movieDataService = movieDataService;
         this.movie = new __WEBPACK_IMPORTED_MODULE_2__shared_movie__["a" /* Movie */]();
+        this.isError = false;
+        this.errorMessage = '';
     }
     MovieCreatorComponent.prototype.saveMovie = function () {
-        this.movieDataService.save(this.movie);
-        this.router.navigate(['/movies']);
+        var _this = this;
+        if (this.movie.name == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid title for the Movie.";
+        }
+        if (this.movie.description == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid description for the Movie.";
+        }
+        if (this.movie.year == null || !Number(this.movie.year) || this.movie.year < 1800 || this.movie.year > 2017) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid Year for the Movie (1800-2017).";
+        }
+        if (this.movie.rating == null || !Number(this.movie.rating) || this.movie.rating < 1 || this.movie.rating > 5) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid Rating for the Movie (1-5).";
+        }
+        if (!this.isError) {
+            this.movieDataService.save(this.movie).then(function (res) {
+                _this.router.navigate(['/movies']);
+            }).catch(function (error) { return _this.error = error; });
+        }
     };
     MovieCreatorComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
@@ -57884,6 +57745,8 @@ var MovieEditorComponent = (function () {
         this.route = route;
         this.movieDataService = movieDataService;
         this.movie = new __WEBPACK_IMPORTED_MODULE_2__shared_movie__["a" /* Movie */]();
+        this.isError = false;
+        this.errorMessage = '';
     }
     MovieEditorComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -57893,8 +57756,28 @@ var MovieEditorComponent = (function () {
         });
     };
     MovieEditorComponent.prototype.saveMovie = function () {
-        this.movieDataService.save(this.movie);
-        this.router.navigate(['/movies']);
+        var _this = this;
+        if (this.movie.name == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid title for the Movie.";
+        }
+        if (this.movie.description == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid description for the Movie.";
+        }
+        if (this.movie.year == null || !Number(this.movie.year) || this.movie.year < 1800 || this.movie.year > 2017) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid Year for the Movie (1800-2017).";
+        }
+        if (this.movie.rating == null || !Number(this.movie.rating) || this.movie.rating < 1 || this.movie.rating > 5) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid Rating for the Movie (1-5).";
+        }
+        if (!this.isError) {
+            this.movieDataService.save(this.movie).then(function (res) {
+                _this.router.navigate(['/movies']);
+            }).catch(function (error) { return _this.error = error; });
+        }
     };
     MovieEditorComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
@@ -57940,7 +57823,10 @@ var MovieViewerComponent = (function () {
         var _this = this;
         var id = this.route.params.forEach(function (params) {
             var id = +params['id'];
-            _this.movieDataService.getMovie(id).then(function (movie) { return _this.movie = movie; });
+            _this.movieDataService.getMovie(id).then(function (movie) {
+                _this.movie = movie;
+                //debugger;
+            });
         });
     };
     MovieViewerComponent = __decorate([
@@ -57980,7 +57866,11 @@ var MovieComponent = (function () {
     }
     MovieComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.movieDataService.getMovies().then(function (movies) { return _this.movies = movies; });
+        this.movieDataService.getToken().then(function (res) {
+            var token = res.token;
+            localStorage.setItem('currentUser', JSON.stringify({ token: token }));
+            _this.movieDataService.getMovies().then(function (movies) { _this.movies = movies; });
+        });
     };
     MovieComponent.prototype.deleteMovie = function (movie, event) {
         var _this = this;
@@ -58003,186 +57893,11 @@ var MovieComponent = (function () {
 
 
 /***/ },
-/* 503 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__(186);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_toast_toast_component__ = __webpack_require__(208);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_data_service__ = __webpack_require__(206);
-/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return OrderComponent; });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-
-
-
-
-var OrderComponent = (function () {
-    function OrderComponent(http, dataService, toast, formBuilder) {
-        this.http = http;
-        this.dataService = dataService;
-        this.toast = toast;
-        this.formBuilder = formBuilder;
-        //private cats = [];
-        this.products = [];
-        this.selectedproducts = [];
-        this.sizes = [];
-        this.colors = [];
-        this.isLoading = true;
-        this.isDataLoading = true;
-        this.isModalLoading = false;
-        this.product = {};
-        this.selectedproduct = {};
-        this.productSize = "";
-        this.productColor = "";
-        this.modalname = "";
-        this.imagepath = "";
-        this.productprice = "";
-        this.productQty = 1;
-        this.isEditing = false;
-        this.amount = {};
-    }
-    OrderComponent.prototype.ngOnInit = function () {
-        this.isDataLoading = true;
-        this.selectedproducts = [];
-        this.getSelectedProducts();
-        this.getSizes();
-        this.getColors();
-        this.getTotalAmount();
-    };
-    OrderComponent.prototype.getProducts = function () {
-        var _this = this;
-        this.dataService.getProducts().subscribe(function (data) { return _this.products = data; }, function (error) { return console.log(error); }, function () { return _this.isLoading = false; });
-    };
-    OrderComponent.prototype.getSelectedProducts = function () {
-        var _this = this;
-        this.dataService.getSelectedProducts().subscribe(function (data) {
-            _this.selectedproducts = data;
-        }, function (error) { return console.log(error); }, function () { return _this.isDataLoading = false; });
-    };
-    OrderComponent.prototype.getSizes = function () {
-        var _this = this;
-        this.dataService.getSizes().subscribe(function (data) { return _this.sizes = data; }, function (error) { return console.log(error); }, function () { return _this.isLoading = false; });
-    };
-    OrderComponent.prototype.getColors = function () {
-        var _this = this;
-        this.dataService.getColors().subscribe(function (data) { return _this.colors = data; }, function (error) { return console.log(error); }, function () { return _this.isLoading = false; });
-    };
-    OrderComponent.prototype.getColorByCode = function (code) {
-        var name = "";
-        for (var i = 0; i < this.colors.length; i++) {
-            if (this.colors[i].hexcode == code) {
-                name = this.colors[i].name;
-            }
-        }
-        return name;
-    };
-    OrderComponent.prototype.loadProduct = function (product) {
-        this.productSize = product.p_sizecode;
-        this.productQty = product.p_quantity;
-        this.productColor = product.p_colorcode;
-        this.modalname = product.info.p_variation + " " + product.info.p_name;
-        this.imagepath = product.info.p_image;
-        this.productprice = product.info.p_originalprice;
-        this.enableEditing(this.productSize, this.productColor);
-        this.product = product;
-    };
-    OrderComponent.prototype.selectColor = function (color) {
-        this.productColor = color;
-    };
-    OrderComponent.prototype.editProduct = function (prod) {
-        var _this = this;
-        this.selectedproduct = { p_id: prod.p_id, old_p_sizecode: prod.p_sizecode, old_p_colorcode: prod.p_colorcode, new_p_sizecode: this.productSize, new_p_colorcode: this.productColor, old_p_quantity: prod.p_quantity, new_p_quantity: this.productQty };
-        this.dataService.editProduct(this.selectedproduct).subscribe(function (res) {
-            _this.productSize = "";
-            _this.productQty = 1;
-            _this.productColor = "";
-            _this.toast.setMessage("Item edited successfully.", "success");
-            _this.getSelectedProducts();
-            _this.getTotalAmount();
-        }, function (error) { return console.log(error); });
-    };
-    OrderComponent.prototype.deleteProduct = function (prod) {
-        var _this = this;
-        if (window.confirm("Are you sure you want to permanently delete this item?")) {
-            this.selectedproduct = { p_id: prod.p_id, p_sizecode: prod.p_sizecode, p_colorcode: prod.p_colorcode, p_quantity: prod.p_quantity };
-            this.dataService.deleteProduct(this.selectedproduct).subscribe(function (res) {
-                _this.productSize = "";
-                _this.productColor = "";
-                _this.toast.setMessage("Item deleted successfully.", "success");
-                _this.getSelectedProducts();
-                _this.getTotalAmount();
-            }, function (error) { return console.log(error); });
-        }
-    };
-    OrderComponent.prototype.enableEditing = function (size, color) {
-        if (size != "" && color != "") {
-            this.isEditing = true;
-        }
-        else {
-            this.isEditing = false;
-        }
-    };
-    OrderComponent.prototype.getTotalAmount = function () {
-        var _this = this;
-        this.dataService.getTotal().subscribe(function (data) { return _this.amount = data; }, function (error) { return console.log(error); }, function () { return _this.isLoading = false; });
-    };
-    OrderComponent = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
-            selector: 'app-order',
-            template: __webpack_require__(678),
-            styles: [__webpack_require__(671)]
-        }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4__services_data_service__["a" /* DataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_4__services_data_service__["a" /* DataService */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__shared_toast_toast_component__["a" /* ToastComponent */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__shared_toast_toast_component__["a" /* ToastComponent */]) === 'function' && _c) || Object, (typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormBuilder */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormBuilder */]) === 'function' && _d) || Object])
-    ], OrderComponent);
-    return OrderComponent;
-    var _a, _b, _c, _d;
-}());
-
-
-/***/ },
+/* 503 */,
 /* 504 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return TitleCase; });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-/*
- * Changes the case of the first letter of a given number of words in a string.
-*/
-var TitleCase = (function () {
-    function TitleCase() {
-    }
-    TitleCase.prototype.transform = function (input, length) {
-        return input.length > 0 ? input.replace(/\w\S*/g, (function (txt) { return txt[0].toUpperCase() + txt.substr(1).toLowerCase(); })) : '';
-    };
-    TitleCase = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Pipe"])({ name: 'titleCase' }), 
-        __metadata('design:paramtypes', [])
-    ], TitleCase);
-    return TitleCase;
-}());
-
+throw new Error("Module build failed: Error: ENOENT: no such file or directory, open 'E:\\dev\\movies-angular2-nodejs-app\\app\\src\\app\\services\\titlecase.pipe.ts'\n    at Error (native)");
 
 /***/ },
 /* 505 */
@@ -61373,24 +61088,14 @@ process.umask = function() { return 0; };
 module.exports = ".heading{\r\n    font-weight:bold;\r\n    color:white; \r\n    font-size:21px;\r\n    font-family:cursive;\r\n}\r\n\r\n.nav-head{\r\n    padding-top:15px;\r\n}"
 
 /***/ },
-/* 669 */
-/***/ function(module, exports) {
-
-module.exports = ".table td, .table th {\r\n   text-align: center;\r\n   width: 25%;  \r\n}\r\n\r\np{\r\n    padding: 50px;\r\n    font-size: 32px;\r\n    font-weight: bold;\r\n    text-align: center;\r\n    background: #dbdfe5;\r\n}\r\n\r\n.vspace{\r\n    margin-top:25px;\r\n}\r\n\r\n\r\n.odd{\r\n \r\n\r\n}\r\n.even{\r\n   \r\n}\r\n\r\n.rowCover{\r\n   padding:20px\r\n}\r\n\r\n\r\n.shopping-head\r\n{\r\n    color: #a7a7a7;\r\n    font-family: \"Trebuchet MS\";\r\n    font-size: 48px;\r\n    font-style: normal;\r\n    font-weight: normal;\r\n    margin-bottom: 20px;\r\n    padding: 27px 0 10px 30px;\r\n\r\n}\r\n\r\n\r\n\r\n.prod-name{\r\n    color: #808080;\r\n    font-size: 14px;\r\n    font-weight: 700;\r\n    margin-left: -14px;\r\n}\r\n\r\n\r\n.prod-style{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n    margin-left: -14px;\r\n}\r\n\r\n.link{\r\n    padding: 0 20px;\r\n    cursor:pointer;\r\n}\r\n\r\n\r\n.prod-action{\r\n    color: #60767c;\r\n    font-size: 13px;\r\n    font-weight: normal;\r\n    margin-left: -34px;\r\n    margin-top: 60px;\r\n}\r\n\r\n.input-qty{\r\n    width:28px;\r\n    padding:1px 2px 3px 4px;\r\n    padding: 0 0 2px 10px;\r\n    width: 34px;\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n}\r\n\r\n.prod-size{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 600;\r\n    padding: 2px 0 0 19px;\r\n}\r\n\r\n\r\n.prod-qty{\r\n    padding: 0;\r\n}\r\n\r\n\r\n.price-value{\r\n    padding: 0;\r\n    vertical-align: text-bottom;\r\n}\r\n\r\n.price-text{\r\n   color: #808080;\r\n    font-size: 21px;\r\n    font-weight: 500;\r\n    margin-left: -13px;\r\n    padding: 0 0 0 5px;\r\n}\r\n\r\n.prod-currency{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n\r\n\r\n\r\n.prod-name-alt{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n    \r\n}\r\n\r\n.prod-info{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    \r\n}\r\n\r\n\r\n\r\n.prod-action-alt{\r\n    text-align:center;\r\n    color: #60767c;\r\n    font-size: 12px;\r\n    font-weight: normal;\r\n    margin-left: -40px;\r\n    margin-top: 50px;\r\n}\r\n\r\n.price-text-alt{\r\n   color: #808080;\r\n    font-size: 21px;\r\n    font-weight: 500;\r\n    margin-left: 8px;\r\n    padding: 3px 0px 15px 5px;\r\n}\r\n\r\n\r\n.prod-currency-alt{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n\r\n.align-center{\r\n    text-align:center;\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 400;\r\n}\r\n\r\n\r\n@media (min-width: 768px) {\r\n    \r\n.header-border{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 40px 0 9px;\r\n}\r\n\r\n.rowBorder{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    padding-bottom: 13px;\r\n}\r\n\r\n}\r\n\r\n@media (max-width: 767px) {\r\n    .align-right{\r\n        text-align: right;\r\n    }\r\n\r\n    \r\n.header-border{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 10px 0 9px;\r\n}\r\n\r\n\r\n.rowBorder{\r\n    border-bottom: 2px solid #e1e1e1;\r\n    padding-bottom: 13px;\r\n    margin-right:3px;\r\n    margin-left:3px;\r\n}\r\n\r\n}"
-
-/***/ },
+/* 669 */,
 /* 670 */
 /***/ function(module, exports) {
 
 module.exports = "body {\r\n  font-family: \"Trebuchet MS\";\r\n}\r\n\r\np{\r\n    padding: 50px;\r\n    font-size: 32px;\r\n    font-weight: bold;\r\n    text-align: center;\r\n    background: #dbdfe5;\r\n}\r\n\r\n.vspace{\r\n    margin-top:25px;\r\n}\r\n\r\n\r\n.odd{\r\n \r\n\r\n}\r\n.even{\r\n   \r\n}\r\n\r\n.rowCover{\r\n   padding:20px\r\n}\r\n\r\n.rowBorder{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    padding-bottom: 30px;\r\n}\r\n\r\n\r\n.rowBorder-alt{\r\n    border-bottom: 3px solid #e1e1e1;\r\n    padding-bottom: 15px;\r\n    margin-left:10px;\r\n}\r\n\r\n.shopping-head\r\n{\r\n    color: #a7a7a7;\r\n    font-family: \"Trebuchet MS\";\r\n    font-size: 48px;\r\n    font-style: normal;\r\n    font-weight: normal;\r\n    margin-bottom: 20px;\r\n    padding: 27px 0 10px 30px;\r\n\r\n}\r\n\r\n.border_text{\r\n    border:1px solid solid;\r\n}\r\n\r\n.header-border{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 40px 0 9px;\r\n}\r\n\r\n.header-border-alt{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 40px 0 9px;\r\n    margin-left:10px;\r\n    margin-right:2px;\r\n}\r\n\r\n.cell-size{\r\n    \r\n}\r\n\r\n.cell-qty{\r\n    \r\n}\r\n\r\n.prod-name{\r\n    color: #808080;\r\n    font-size: 14px;\r\n    font-weight: 700;\r\n    margin-left: -14px;\r\n}\r\n\r\n.prod-name-alt{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n    \r\n}\r\n\r\n\r\n.prod-info{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    \r\n}\r\n\r\n.prod-style{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n    margin-left: -14px;\r\n}\r\n\r\n\r\n.prod-action{\r\n    color: #60767c;\r\n    font-size: 13px;\r\n    font-weight: normal;\r\n    margin-left: -34px;\r\n    margin-top: 60px;\r\n}\r\n\r\n\r\n.prod-action-alt{\r\n    text-align:center;\r\n    color: #60767c;\r\n    font-size: 12px;\r\n    font-weight: normal;\r\n    margin-left: -5px;\r\n}\r\n\r\n\r\n.input-qty{\r\n    width:28px;\r\n    padding:1px 2px 3px 4px;\r\n    padding: 0 0 2px 10px;\r\n    width: 34px;\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n}\r\n\r\n.prod-size{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 600;\r\n    padding: 2px 0 0 19px;\r\n}\r\n\r\n\r\n.prod-qty{\r\n    padding: 0;\r\n}\r\n\r\n\r\n.prod-qty-alt{\r\n        padding: 6px 0px 0px 16px;\r\n        color: #808080;\r\n        font-size: 13px;\r\n        font-weight: 400;\r\n}\r\n\r\n.price-value{\r\n    padding: 0;\r\n    vertical-align: text-bottom;\r\n}\r\n\r\n.price-text-alt{\r\n   color: #808080;\r\n    font-size: 21px;\r\n    font-weight: 500;\r\n    margin-left: 8px;\r\n    padding: 3px 0px 15px 5px;\r\n}\r\n\r\n.prod-currency{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n.prod-currency-alt{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n.side-text-1{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 600;\r\n    padding: 0px 0px 20px 0px;\r\n    margin-top: 30px;\r\n}\r\n\r\n.side-text-2{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    padding: 0px 0px 20px 0px;\r\n}\r\n\r\n.side-text-3{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    text-decoration:underline;\r\n    padding: 0px 0px 20px 0px;\r\n}\r\n\r\n.btnApply{\r\n    width:35%;\r\n    background-color:white;\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n}\r\n\r\n.txtPromotion{\r\n    width:60%;\r\n     color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n}\r\n\r\n.bold-text{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 700;\r\n    font-family: \"Trebuchet MS\"\r\n}\r\n\r\n\r\n.bolder-text{\r\n    color: #808080;\r\n    font-size: 16px;\r\n    font-weight: 900;\r\n    font-family: \"Trebuchet MS\"\r\n}\r\n\r\n\r\n.light-text{\r\n    color: #808080;\r\n    font-size: 11px;\r\n    font-weight: 400;\r\n}\r\n\r\n\r\n\r\n.lbl-amount{\r\n    text-align:right;\r\n}\r\n\r\n.price-row{\r\n    margin-top:35px;\r\n}\r\n\r\n\r\n\r\n\r\n.top-border{\r\n    border-top: 3px solid #e1e1e1;\r\n}\r\n\r\n\r\n.align-center{\r\n    text-align:center;\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 400;\r\n}\r\n\r\n@media (min-width: 768px) {\r\n\r\n    \r\n.link{\r\n    padding: 0 20px;\r\n    cursor:pointer;\r\n}\r\n\r\n.price-row-3{\r\n    margin-top:30px;\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    padding-top:10px;\r\n}\r\n\r\n    \r\n    .dvPromotion{\r\n        border-bottom: 5px solid #e1e1e1;\r\n        margin-top:30px;\r\n        height:73px;\r\n    }\r\n\r\n    .price-text-bold{\r\n       color: #808080;\r\n        font-size: 25px;\r\n        font-weight: bold;\r\n        margin-left: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    .price-margin{\r\n        margin-right:60px;\r\n    }\r\n\r\n    .continue-shopping{\r\n        text-align:right;\r\n        padding-top:10px;\r\n        text-decoration:underline;\r\n    }\r\n\r\n    .align-right{\r\n      text-align:right;\r\n  }\r\n    .bottom-text{\r\n        margin-top:4px;\r\n        text-align:right;\r\n    }\r\n\r\n    .price-row-2{\r\n    margin-top:30px;\r\n    }\r\n\r\n    \r\n    .price-text{\r\n       color: #808080;\r\n        font-size: 21px;\r\n        font-weight: 500;\r\n        margin-left: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n\r\n    .free{\r\n        text-align:right;padding-right:80px;\r\n    }\r\n}\r\n\r\n@media (max-width: 767px) {\r\n    /* CSS goes here */\r\n    .free{\r\n        text-align:right;padding-right:40px;\r\n    }\r\n    \r\n.link{\r\n    padding: 0 13px;\r\n    cursor:pointer;\r\n}\r\n\r\n    \r\n.price-row-3{\r\n    margin-top:30px;\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    padding-top:10px;\r\n    margin-left:2px;\r\n    margin-right:4px;\r\n}\r\n\r\n    \r\n    .dvPromotion{\r\n        border-bottom: 5px solid #e1e1e1;\r\n        margin-top:30px;\r\n        height:73px;\r\n        margin-left:12px;\r\n    }\r\n    \r\n    .price-text-bold{\r\n       color: #808080;\r\n        font-size: 21px;\r\n        font-weight: bold;\r\n        margin-left: -13px;\r\n        margin-top: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    .price-text{\r\n       color: #808080;\r\n        font-size: 19px;\r\n        font-weight: 500;\r\n        margin-left: -13px;\r\n        margin-top: -14px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    \r\n    .price-margin{\r\n        margin-right:5px;\r\n    }    \r\n    .centered{\r\n        text-align:center!important;\r\n    }\r\n\r\n    .broad{\r\n        width:90%;\r\n    }\r\n\r\n    .top-margin{\r\n        margin-top: 5px;\r\n    }\r\n\r\n    .row-swap {\r\n    display: flex;\r\n    flex-direction: column\r\n  }\r\n  .row-swap > div:first-of-type {\r\n    order: 1;\r\n  }\r\n\r\n  \r\n.price-row-2{\r\n    margin-top:10px;\r\n    \r\n}\r\n\r\n.extra-pad{\r\n    padding:0px 45px 0px 45px;\r\n    margin-left:10px;\r\n    margin-right:10px;\r\n}\r\n  \r\n}\r\n"
 
 /***/ },
-/* 671 */
-/***/ function(module, exports) {
-
-module.exports = "body {\r\n  font-family: \"Trebuchet MS\";\r\n}\r\n\r\np{\r\n    padding: 50px;\r\n    font-size: 32px;\r\n    font-weight: bold;\r\n    text-align: center;\r\n    background: #dbdfe5;\r\n}\r\n\r\n.vspace{\r\n    margin-top:25px;\r\n}\r\n\r\n\r\n.odd{\r\n \r\n\r\n}\r\n.even{\r\n   \r\n}\r\n\r\n.rowCover{\r\n   padding:20px\r\n}\r\n\r\n.rowBorder{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    padding-bottom: 30px;\r\n}\r\n\r\n\r\n.rowBorder-alt{\r\n    border-bottom: 3px solid #e1e1e1;\r\n    padding-bottom: 15px;\r\n    margin-left:10px;\r\n}\r\n\r\n.shopping-head\r\n{\r\n    color: #a7a7a7;\r\n    font-family: \"Trebuchet MS\";\r\n    font-size: 48px;\r\n    font-style: normal;\r\n    font-weight: normal;\r\n    margin-bottom: 20px;\r\n    padding: 27px 0 10px 30px;\r\n\r\n}\r\n\r\n.border_text{\r\n    border:1px solid solid;\r\n}\r\n\r\n.header-border{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 40px 0 9px;\r\n}\r\n\r\n.header-border-alt{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 40px 0 9px;\r\n    margin-left:10px;\r\n    margin-right:2px;\r\n}\r\n\r\n.cell-size{\r\n    \r\n}\r\n\r\n.cell-qty{\r\n    \r\n}\r\n\r\n.prod-name{\r\n    color: #808080;\r\n    font-size: 14px;\r\n    font-weight: 700;\r\n    margin-left: -14px;\r\n}\r\n\r\n.prod-name-alt{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n    \r\n}\r\n\r\n\r\n.prod-info{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    \r\n}\r\n\r\n.prod-style{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n    margin-left: -14px;\r\n}\r\n\r\n\r\n.prod-action{\r\n    color: #60767c;\r\n    font-size: 13px;\r\n    font-weight: normal;\r\n    margin-left: -34px;\r\n    margin-top: 60px;\r\n}\r\n\r\n\r\n.prod-action-alt{\r\n    text-align:center;\r\n    color: #60767c;\r\n    font-size: 12px;\r\n    font-weight: normal;\r\n    margin-left: -5px;\r\n}\r\n\r\n\r\n.input-qty{\r\n    width:28px;\r\n    padding:1px 2px 3px 4px;\r\n    padding: 0 0 2px 10px;\r\n    width: 34px;\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n}\r\n\r\n.prod-size{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 600;\r\n    padding: 2px 0 0 19px;\r\n}\r\n\r\n\r\n.prod-qty{\r\n    padding: 0;\r\n}\r\n\r\n\r\n.prod-qty-alt{\r\n        padding: 6px 0px 0px 16px;\r\n        color: #808080;\r\n        font-size: 13px;\r\n        font-weight: 400;\r\n}\r\n\r\n.price-value{\r\n    padding: 0;\r\n    vertical-align: text-bottom;\r\n}\r\n\r\n.price-text-alt{\r\n   color: #808080;\r\n    font-size: 21px;\r\n    font-weight: 500;\r\n    margin-left: 8px;\r\n    padding: 3px 0px 15px 5px;\r\n}\r\n\r\n.prod-currency{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n.prod-currency-alt{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n.side-text-1{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 600;\r\n    padding: 0px 0px 20px 0px;\r\n    margin-top: 30px;\r\n}\r\n\r\n.side-text-2{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    padding: 0px 0px 20px 0px;\r\n}\r\n\r\n.side-text-3{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    text-decoration:underline;\r\n    padding: 0px 0px 20px 0px;\r\n}\r\n\r\n.btnApply{\r\n    width:35%;\r\n    background-color:white;\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n}\r\n\r\n.txtPromotion{\r\n    width:60%;\r\n     color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n}\r\n\r\n.bold-text{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 700;\r\n    font-family: \"Trebuchet MS\"\r\n}\r\n\r\n\r\n.bolder-text{\r\n    color: #808080;\r\n    font-size: 16px;\r\n    font-weight: 900;\r\n    font-family: \"Trebuchet MS\"\r\n}\r\n\r\n\r\n.light-text{\r\n    color: #808080;\r\n    font-size: 11px;\r\n    font-weight: 400;\r\n}\r\n\r\n\r\n\r\n.lbl-amount{\r\n    text-align:right;\r\n}\r\n\r\n.price-row{\r\n    margin-top:35px;\r\n}\r\n\r\n\r\n\r\n\r\n.top-border{\r\n    border-top: 3px solid #e1e1e1;\r\n}\r\n\r\n\r\n.align-center{\r\n    text-align:center;\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 400;\r\n}\r\n\r\n@media (min-width: 768px) {\r\n\r\n    \r\n.link{\r\n    padding: 0 20px;\r\n    cursor:pointer;\r\n}\r\n\r\n.price-row-3{\r\n    margin-top:30px;\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    padding-top:10px;\r\n}\r\n\r\n    \r\n    .dvPromotion{\r\n        border-bottom: 5px solid #e1e1e1;\r\n        margin-top:30px;\r\n        height:73px;\r\n    }\r\n\r\n    .price-text-bold{\r\n       color: #808080;\r\n        font-size: 25px;\r\n        font-weight: bold;\r\n        margin-left: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    .price-margin{\r\n        margin-right:60px;\r\n    }\r\n\r\n    .continue-shopping{\r\n        text-align:right;\r\n        padding-top:10px;\r\n        text-decoration:underline;\r\n    }\r\n\r\n    .align-right{\r\n      text-align:right;\r\n  }\r\n    .bottom-text{\r\n        margin-top:4px;\r\n        text-align:right;\r\n    }\r\n\r\n    .price-row-2{\r\n    margin-top:30px;\r\n    }\r\n\r\n    \r\n    .price-text{\r\n       color: #808080;\r\n        font-size: 21px;\r\n        font-weight: 500;\r\n        margin-left: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n\r\n    .free{\r\n        text-align:right;padding-right:80px;\r\n    }\r\n}\r\n\r\n@media (max-width: 767px) {\r\n    /* CSS goes here */\r\n    .free{\r\n        text-align:right;padding-right:40px;\r\n    }\r\n    \r\n.link{\r\n    padding: 0 13px;\r\n    cursor:pointer;\r\n}\r\n\r\n    \r\n.price-row-3{\r\n    margin-top:30px;\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    padding-top:10px;\r\n    margin-left:2px;\r\n    margin-right:4px;\r\n}\r\n\r\n    \r\n    .dvPromotion{\r\n        border-bottom: 5px solid #e1e1e1;\r\n        margin-top:30px;\r\n        height:73px;\r\n        margin-left:12px;\r\n    }\r\n    \r\n    .price-text-bold{\r\n       color: #808080;\r\n        font-size: 21px;\r\n        font-weight: bold;\r\n        margin-left: -13px;\r\n        margin-top: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    .price-text{\r\n       color: #808080;\r\n        font-size: 19px;\r\n        font-weight: 500;\r\n        margin-left: -13px;\r\n        margin-top: -14px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    \r\n    .price-margin{\r\n        margin-right:5px;\r\n    }    \r\n    .centered{\r\n        text-align:center!important;\r\n    }\r\n\r\n    .broad{\r\n        width:90%;\r\n    }\r\n\r\n    .top-margin{\r\n        margin-top: 5px;\r\n    }\r\n\r\n    .row-swap {\r\n    display: flex;\r\n    flex-direction: column\r\n  }\r\n  .row-swap > div:first-of-type {\r\n    order: 1;\r\n  }\r\n\r\n  \r\n.price-row-2{\r\n    margin-top:10px;\r\n    \r\n}\r\n\r\n.extra-pad{\r\n    padding:0px 45px 0px 45px;\r\n    margin-left:10px;\r\n    margin-right:10px;\r\n}\r\n  \r\n}\r\n"
-
-/***/ },
+/* 671 */,
 /* 672 */
 /***/ function(module, exports) {
 
@@ -61401,33 +61106,23 @@ module.exports = ".alert {\r\n\tz-index: 999;\r\n\tposition: fixed;\r\n\tbottom:
 /* 674 */
 /***/ function(module, exports) {
 
-module.exports = "<div class=\"container\">\r\n\r\n  <nav class=\"navbar navbar-dark bg-inverse nav-head\">\r\n    <div class=\"nav navbar-nav\" style=\"float:left\"> <img src=\"/assets/logo.png\" alt=\"\" height=\"40px\" width=\"50px\"> <span class=\"heading\">Movies App</span> </div> \r\n    <div class=\"nav navbar-nav\" style=\"float:right\">\r\n        <a routerLink=\"/\" class=\"nav-item nav-link\" routerLinkActive=\"active\" [routerLinkActiveOptions]=\"{exact:true}\">\r\n          <i class=\"fa fa-list\"></i> <span class=\"hidden-xs-down\">Movies</span>\r\n        </a>\r\n        <a routerLink=\"/order\" class=\"nav-item nav-link\" routerLinkActive=\"active\">\r\n            <i class=\"fa fa-user-o\"></i> <span class=\"hidden-xs-down\"> Actors </span>\r\n        </a>\r\n        <a routerlink=\"/movies\" class=\"nav-item nav-link\" routerlinkactive=\"active\">\r\n            <i class=\"fa fa-user\"></i> <span class=\"hidden-xs-down\"> Directors </span>\r\n        </a>\r\n    </div>\r\n  </nav>\r\n\r\n  <router-outlet></router-outlet>\r\n\r\n</div>"
+module.exports = "<div class=\"container\">\r\n\r\n  <nav class=\"navbar navbar-dark bg-inverse nav-head\">\r\n    <div class=\"nav navbar-nav\" style=\"float:left\"> <img src=\"/assets/logo.png\" alt=\"\" height=\"40px\" width=\"50px\"> <span class=\"heading\">Movies App</span> </div> \r\n    <div class=\"nav navbar-nav\" style=\"float:right\">\r\n        <a routerLink=\"/\" class=\"nav-item nav-link\" routerLinkActive=\"active\" [routerLinkActiveOptions]=\"{exact:true}\">\r\n          <i class=\"fa fa-list\"></i> <span class=\"hidden-xs-down\">Movies</span>\r\n        </a>\r\n        <a routerLink=\"/actors\" class=\"nav-item nav-link\" routerLinkActive=\"active\">\r\n            <i class=\"fa fa-user-o\"></i> <span class=\"hidden-xs-down\"> Actors </span>\r\n        </a>\r\n        <a routerLink=\"/movies\" class=\"nav-item nav-link\" routerLinkActive=\"active\">\r\n            <i class=\"fa fa-user\"></i> <span class=\"hidden-xs-down\"> Directors </span>\r\n        </a>\r\n    </div>\r\n  </nav>\r\n\r\n  <router-outlet></router-outlet>\r\n\r\n</div>"
 
 /***/ },
-/* 675 */
-/***/ function(module, exports) {
-
-module.exports = "<div class=\"card\" *ngIf=\"isLoading\">\r\n  <h4 class=\"card-header\">Loading...</h4>\r\n  <div class=\"card-block text-xs-center\">\r\n    <i class=\"fa fa-circle-o-notch fa-spin fa-3x\"></i>\r\n  </div>\r\n</div>\r\n\r\n\r\n<div class=\"row hidden-xs-down\">\r\n    <h1 class=\"shopping-head\"> ADD PRODUCTS TO YOUR BAG </h1>\r\n</div>\r\n\r\n<div class=\"col-md-12 col-xs-12 header-border\">\r\n    <div class=\"row\">\r\n        <div class=\"col-xs-12 hidden-md-up\"> SELECT PRODUCTS TO YOUR BAG  </div>\r\n        <div class=\"col-md-4 col-xs-12 align-right\"> {{products.length}} PRODUCTS</div>\r\n        <div class=\"col-md-8 hidden-xs-down\">\r\n            <div class=\"col-md-6 col-xs-6\"> </div>\r\n            <div class=\"col-md-2 col-xs-2 cell-size\">  </div>\r\n            <div class=\"col-md-2 col-xs-2 cell-qty\">  </div>\r\n            <div class=\"col-md-2 col-xs-2\"> PRICE </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n<div class=\"row vspace\">\r\n    <div class=\"col-md-12 col-xs-12 rowCover\" *ngFor=\"let product of products; let index=index; let odd=odd; let even=even;\" [ngClass]=\"{ odd: odd, even: even }\">\r\n      \r\n        <div class=\"row rowBorder hidden-xs-down\">\r\n            <div class=\"col-md-3\"><img src=\"/assets/{{product.p_image}}\" /></div>\r\n            <div class=\"col-md-9\">\r\n\r\n                <div class=\"row\">\r\n                    <div class=\"col-md-6 prod-name\"> {{product.p_variation | uppercase}} {{product.p_name | uppercase}} </div>\r\n\r\n                    <div class=\"col-md-2\"> </div>\r\n                    <div class=\"col-md-2\">  </div>\r\n                    <div class=\"col-md-2 price-text\"> <span class=\"prod-currency\">{{product.p_currency}}</span> <span class=\"price-value\">{{product.p_originalprice}}</span></div>\r\n                </div>\r\n                <div class=\"row prod-style\">\r\n                    Style #: {{product.p_style | uppercase}}\r\n                </div>\r\n                <div class=\"row\">\r\n\r\n                </div>\r\n                <div class=\"row prod-action\">\r\n                    <a id=\"neworder\" title=\"Add Product\" (click)=\"modal.open();loadProduct(product);\" style=\"text-decoration:underline\" class=\"link\">ADD TO CART</a>\r\n                </div>\r\n            </div>\r\n        </div>\r\n\r\n        <div class=\"row rowBorder hidden-md-up\">\r\n            <div class=\"row\">\r\n                <div class=\"col-xs-6\"><img src=\"/assets/{{product.p_image}}\" /></div>\r\n                <div class=\"col-xs-6\">\r\n\r\n                    <div class=\"row\">\r\n                        <div class=\"col-xs-12 prod-name-alt\"> {{product.p_variation | uppercase}} </div>\r\n                        <div class=\"col-xs-12 prod-name-alt\"> {{product.p_name | uppercase}} </div>\r\n                        <div class=\"col-xs-12 prod-info\"> Style #: {{product.p_style | uppercase}} </div>\r\n                        \r\n                        <div class=\"row prod-action-alt col-xs-12\">\r\n                            <a id=\"neworder\" title=\"Add Product\" (click)=\"modal.open();loadProduct(product);\" style=\"text-decoration:underline\" class=\"link\">ADD TO CART</a>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n</div>\r\n</div>\r\n\r\n<div class=\"row vspace col-xs-12 colmd-12 align-center\">\r\n    Powered By <a href=\"https://github.com/rahul-openstack\">Rahul Srivastava</a>\r\n</div>\r\n\r\n\r\n    <app-toast [message]=\"toast.message\"></app-toast>\r\n\r\n\r\n    <modal #modal>\r\n        <style type=\"text/css\">\r\n            @media (min-width: 768px) {\r\n                .modal-prod-name {\r\n                    text-align: center;\r\n                }\r\n\r\n                .modal-name {\r\n                    color: #b2b2b2;\r\n                    font-size: 15px;\r\n                    font-weight: 700;\r\n                    margin-left: -14px;\r\n                    text-align: center;\r\n                    margin-bottom: 5px;\r\n                    border-top: 5px solid #e1e1e1;\r\n                    padding-top: 13px;\r\n                }\r\n            }\r\n\r\n\r\n            @media (max-width: 767px) {\r\n                .modal-prod-name {\r\n                    text-align: center;\r\n                    font-size: 16px;\r\n                }\r\n\r\n\r\n                .modal-name {\r\n                    color: #b2b2b2;\r\n                    font-size: 10px;\r\n                    font-weight: 700;\r\n                    margin-left: -14px;\r\n                    text-align: center;\r\n                    margin-bottom: 5px;\r\n                    border-top: 5px solid #e1e1e1;\r\n                    padding-top: 13px;\r\n                }\r\n\r\n                .modal-content {\r\n                    width: 317px !important;\r\n                }\r\n            }\r\n\r\n\r\n\r\n            .modal-price-value {\r\n                padding: 0;\r\n                vertical-align: text-bottom;\r\n            }\r\n\r\n            .modal-price-text {\r\n                color: #808080;\r\n                font-size: 50px;\r\n                font-weight: 600;\r\n                padding: 0 0 0 5px;\r\n                text-align: center;\r\n                margin-bottom: 5px;\r\n            }\r\n\r\n            .modal-prod-currency {\r\n                color: #808080;\r\n                font-size: 38px;\r\n                font-weight: 500;\r\n                vertical-align: text-top;\r\n            }\r\n\r\n            .modal-table {\r\n                width: 100%;\r\n                height: 300px !important;\r\n            }\r\n\r\n            .modal-light-text {\r\n                color: #808080;\r\n                font-size: 11px;\r\n                font-weight: 400;\r\n                text-align: center;\r\n                text-decoration: underline;\r\n            }\r\n\r\n            .modal-center {\r\n                text-align: center;\r\n                margin-bottom: 15px;\r\n            }\r\n\r\n            .modal-box {\r\n                display: inline-block;\r\n                height: 18px;\r\n                margin-left: 10px;\r\n                width: 34px;\r\n            }\r\n\r\n            .modal-box-big {\r\n                display: inline-block;\r\n                height: 24px;\r\n                margin-left: 10px;\r\n                width: 39px;\r\n            }\r\n        </style>\r\n        <modal-header [show-close]=\"true\">\r\n\r\n        </modal-header>\r\n        <modal-body>\r\n\r\n            <table class=\"modal-table\">\r\n                <tr>\r\n                    <td>\r\n\r\n                        <div class=\"modal-prod-name\"> <span class=\"modal-name\">{{ modalname | uppercase }}</span></div>\r\n\r\n                        <div class=\"modal-price-text\"><span class=\"modal-prod-currency\"> $</span> <span class=\"modal-price-value\"> {{ productprice }}</span> </div>\r\n                        <div class=\"modal-center\">\r\n                            <div *ngFor=\"let color of colors\" style=\"display:inline-block;\">\r\n                                <a id=\"prod-{{color.name}}\" (click)=\"selectColor(color.hexcode)\"><div class=\"modal-box\" [style.background-color]=\"color.hexcode\" class=\"{{productColor==color.hexcode ? 'modal-box-big' : 'modal-box'}}\"></div></a>\r\n                            </div>\r\n                        </div>\r\n                        <div class=\"modal-center\">\r\n                            Size:\r\n                            <select [(ngModel)]=\"productSize\" (ngModelChange)=\"enableEditing(productSize,productColor)\">\r\n                                <option value=\"\"> </option>\r\n                                <option *ngFor=\"let size of sizes\" value={{size.code}}>{{size.name}}</option>\r\n                            </select>\r\n\r\n                            Quantity:\r\n                            <select [(ngModel)]=\"productQty\" (ngModelChange)=\"enableEditing(productSize,productColor)\">\r\n                                <option *ngFor=\"let qty of [1,2,3,4,5]\" value={{qty}}>{{qty}}</option>\r\n                            </select>\r\n                        </div>\r\n                        <div class=\"modal-center\"><button class=\"btn btn-primary\" type=\"button\" (click)=\"modal.close();addProduct(product)\" [disabled]=\"!isEditing\">ADD TO BAG</button></div>\r\n                        <div class=\"modal-light-text\">See product details</div>\r\n\r\n\r\n                    </td>\r\n                    <td>\r\n                        <div style=\"display:inline-block;text-align:center\">\r\n                            <img src=\"/assets/{{imagepath}}\" />\r\n                        </div>\r\n                    </td>\r\n                </tr>\r\n            </table>\r\n\r\n\r\n\r\n        </modal-body>\r\n\r\n    </modal>\r\n\r\n\r\n"
-
-/***/ },
+/* 675 */,
 /* 676 */
 /***/ function(module, exports) {
 
-module.exports = "<h3>Details for {{movie.title}}</h3>\r\n<table class=\"table\">\r\n  <tr>\r\n    <td>Movie Title</td>\r\n    <td>{{movie.title}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Director</td>\r\n    <td>{{movie.director}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Release Year</td>\r\n    <td>{{movie.releaseYear}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Movie Genre</td>\r\n    <td>{{movie.genre}}</td>\r\n  </tr>\r\n</table>\r\n<div>\r\n  <a class=\"btn btn-primary\" [routerLink]=\"['/movies', movie._id, 'edit']\">Edit</a>\r\n</div>"
+module.exports = "<h3>Details for {{movie.name}}</h3>\r\n<table class=\"table\">\r\n  <tr>\r\n    <td>Movie Title</td>\r\n    <td>{{movie.name}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Description</td>\r\n    <td>{{movie.description}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Release Year</td>\r\n    <td>{{movie.year}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Rating</td>\r\n    <td>{{movie.rating}}</td>\r\n  </tr>\r\n</table>\r\n<div>\r\n  <a class=\"btn btn-primary\" [routerLink]=\"['/movies', movie.movie_id, 'edit']\">Edit</a>\r\n</div>"
 
 /***/ },
 /* 677 */
 /***/ function(module, exports) {
 
-module.exports = "<h2>Overview of Movies</h2>\r\n<br>\r\n<table class=\"table\">\r\n  <tr *ngFor=\"let movie of movies\">\r\n    <td>{{movie.title}}</td>\r\n    <td align=\"right\">\r\n      <a class=\"btn btn-primary\" [routerLink]=\"['/movies', movie._id, 'view']\">View</a>\r\n      <a class=\"btn btn-danger\"  (click)=\"deleteMovie(movie, $event)\">Delete</a>\r\n    </td>\r\n  </tr>\r\n</table>\r\n\r\n<p><a [routerLink]=\"['/movies/new']\" class=\"btn-primary btn-lg\">Add New Movie</a></p>\r\n\r\n\r\n"
+module.exports = "<br>\r\n<h4>Overview of Movies</h4>\r\n<br>\r\n\r\n<table class=\"table\">\r\n  <tr>\r\n  <td align=\"right\" colspan=\"2\"> <div align=\"right\"><a [routerLink]=\"['/movies/new']\" class=\"btn-primary btn-lg\">Add New Movie</a></div> </td>\r\n  </tr>\r\n  <tr *ngFor=\"let movie of movies\">\r\n    <td>{{movie.name}}</td>\r\n    <td align=\"right\">\r\n      <a class=\"btn btn-primary\" [routerLink]=\"['/movies', movie.movie_id, 'view']\">View</a>\r\n      <a class=\"btn btn-danger\"  (click)=\"deleteMovie(movie, $event)\">Delete</a>\r\n    </td>\r\n  </tr>\r\n</table>\r\n\r\n\r\n\r\n\r\n"
 
 /***/ },
-/* 678 */
-/***/ function(module, exports) {
-
-module.exports = "<div class=\"card\" *ngIf=\"isDataLoading==true\">\r\n    <h4 class=\"card-header\">Loading...</h4>\r\n    <div class=\"card-block text-xs-center\">\r\n        <i class=\"fa fa-circle-o-notch fa-spin fa-3x\"></i>\r\n    </div>\r\n</div>\r\n\r\n<div class=\"row hidden-xs-down\">\r\n    <h1 class=\"shopping-head\"> YOUR SHOPPING BAG </h1>\r\n</div>\r\n\r\n<div *ngIf=\"isDataLoading==false && selectedproducts.length==0\" class=\"row center prod-name\" style=\"text-align:center\"> You have no item in your Bag. Please select products from the <a routerlink=\"/\" href=\"/\"> dashboard</a>.</div>\r\n\r\n\r\n<div class=\"row vspace\" *ngIf=\"isDataLoading==false && selectedproducts.length>0\">\r\n\r\n    <div class=\"col-md-12 col-xs-12 header-border hidden-xs-down\">\r\n        <div class=\" row\">\r\n            <div class=\"col-md-3\"> {{selectedproducts.length}} ITEMS</div>\r\n            <div class=\"col-md-9\">\r\n                <div class=\"col-md-6\"> </div>\r\n                <div class=\"col-md-2 cell-size\"> SIZE </div>\r\n                <div class=\"col-md-2 cell-qty\"> QTY </div>\r\n                <div class=\"col-md-2\"> PRICE </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <div class=\"col-xs-12 header-border-alt hidden-md-up\">\r\n        <div class=\"row\">\r\n            <div class=\"col-xs-9 bold-text\" style=\"text-align:left;padding-left:36px;font-size:18px;\">\r\n                YOUR SHOPPING BAG\r\n            </div>\r\n            <div class=\"col-xs-3\" style=\"text-align:right\"> {{selectedproducts.length}} ITEMS</div>\r\n        </div>\r\n    \r\n    </div>\r\n\r\n        <div class=\"col-md-12 col-xs-12 rowCover\" *ngFor=\"let product of selectedproducts; let index=index; let odd=odd; let even=even;\" [ngClass]=\"{ odd: odd, even: even }\">\r\n            \r\n            <div class=\"row rowBorder hidden-xs-down\" *ngIf=\"product.info\">\r\n                <div class=\"col-md-3\"><img src=\"/assets/{{product.info.p_image}}\" /></div>\r\n                <div class=\"col-md-9\">\r\n\r\n                    <div class=\"row\">\r\n                        <div class=\"col-md-6 prod-name\"> {{product.info.p_variation | uppercase}} {{product.info.p_name | uppercase}} </div>\r\n\r\n                        <div class=\"col-md-2 prod-size\"> {{product.p_sizecode | uppercase}} </div>\r\n                        <div class=\"col-md-2 prod-qty\"> <input type=\"text\" [value]=\"product.p_quantity\" readonly=\"readonly\" class=\"input-qty\" /> </div>\r\n                        <div class=\"col-md-2 price-text\"> <span class=\"prod-currency\">{{product.info.p_currency}}</span> <span class=\"price-value\">{{product.info.p_originalprice}}</span></div>\r\n                    </div>\r\n                    <div class=\"row prod-style\">\r\n                        Style #: {{product.info.p_style | uppercase}}\r\n                    </div>\r\n                    <div class=\"row prod-style\">\r\n                        Colour: {{getColorByCode(product.p_colorcode) | titleCase}}\r\n                    </div>\r\n                    <div class=\"row prod-action\">\r\n                        <a id=\"neworder\" title=\"Edit Product\" (click)=\"modal.open();loadProduct(product);\" class=\"link\">Edit</a> | <a id=\"neworder\" (click)=\"deleteProduct(product);\" class=\"link\" title=\"Remove Product\"> <i class=\"fa fa-remove\"></i> REMOVE</a> | <a title=\"To Be Implemented\" id=\"neworder\" class=\"link\">SAVE FOR LATER</a>\r\n\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n\r\n            <div class=\"row rowBorder-alt hidden-md-up\" *ngIf=\"product.info\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-xs-6\"><img src=\"/assets/{{product.info.p_image}}\" /></div>\r\n                    <div class=\"col-xs-6\">\r\n\r\n                        <div class=\"row\">\r\n                            <div class=\"col-xs-12 prod-name-alt\"> {{product.info.p_variation | uppercase}} </div>\r\n                            <div class=\"col-xs-12 prod-name-alt\"> {{product.info.p_name | uppercase}} </div>\r\n                            <div class=\"col-xs-12 prod-info\"> Style #: {{product.info.p_style | uppercase}} </div>\r\n                            <div class=\"col-xs-12 prod-info\"> Colour: {{getColorByCode(product.p_colorcode) | titleCase}} </div>\r\n                            <div class=\"col-xs-12 prod-info\"> Size: {{product.p_sizecode | uppercase}} </div>\r\n                            <div class=\"col-xs-12 prod-qty-alt\"> QTY: <input type=\"text\" [value]=\"product.p_quantity\" readonly=\"readonly\" class=\"input-qty\" /> </div>\r\n                            <div class=\"col-xs-12 price-text-alt\"> <span class=\"prod-currency-alt\">{{product.info.p_currency}}</span> <span class=\"price-value\">{{product.info.p_originalprice}}</span></div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"row prod-action-alt col-xs-12\">\r\n                    <a id=\"neworder\" title=\"Edit Product\" (click)=\"modal.open();loadProduct(product);\" class=\"link\">Edit</a> | <a id=\"neworder\" (click)=\"deleteProduct(product);\" class=\"link\" title=\"Remove Product\"> <i class=\"fa fa-remove\"></i> REMOVE</a> | <a title=\"To Be Implemented\" id=\"neworder\" class=\"link\">SAVE FOR LATER</a>\r\n                </div>\r\n            </div>\r\n            \r\n        </div>\r\n\r\n    </div>\r\n\r\n    <app-toast [message]=\"toast.message\"></app-toast>\r\n\r\n<div class=\"row\">\r\n    <div class=\"col-md-3 hidden-xs-down\">\r\n        <div class=\"row side-text-1\">\r\n            Need Help <br />\r\n            or have questions?\r\n        </div>\r\n\r\n        <div class=\"row side-text-2\">\r\n            Call Customer Service at <br />\r\n            1-800-555-5555\r\n        </div>\r\n\r\n        <div class=\"row side-text-3\">\r\n            Chat with one of <br />\r\n            our stylists\r\n        </div>\r\n\r\n        <div class=\"row side-text-3\">\r\n            See return <br />\r\n            &amp; exchange policy\r\n        </div>\r\n    </div>\r\n\r\n    <div class=\"col-md-9\" *ngIf=\"selectedproducts.length>0\">\r\n        <div class=\"row dvPromotion\">\r\n            <div class=\"col-md-6 bold-text centered col-xs-12\">\r\n                ENTER PROMOTION CODE <br />\r\n                OR GIFT CARD\r\n            </div>\r\n            <div class=\"col-md-6 centered col-xs-12 extra-pad\">\r\n                <input type=\"text\" class=\"txtPromotion\" /> <button type=\"button\" class=\"btnApply\"> APPLY</button>\r\n\r\n            </div>\r\n        </div>\r\n        <div class=\"row price-row\">\r\n            <div class=\"col-md-7 col-xs-7 bold-text\"> SUBTOTAL </div>\r\n            <div class=\"col-md-5 col-xs-5  lbl-amount price-text\">\r\n                <span class=\"prod-currency\">$</span>\r\n                <span class=\"price-value price-margin\">{{amount.subTotal}}</span>\r\n            </div>\r\n        </div>\r\n        <div class=\"row price-row-2\" *ngIf=\"amount.enableDiscount\">\r\n            <div class=\"col-md-7 bold-text col-xs-7\"> PROMOTION CODE <b>JF10</b> APPLIED </div>\r\n            <div class=\"col-md-5 col-xs-5 lbl-amount price-text\">\r\n                <span> - </span>\r\n                <span class=\"prod-currency\">$</span>\r\n                <span class=\"price-value price-margin\">{{amount.discount}}</span>\r\n            </div>\r\n        </div>\r\n        <div class=\"row price-row-2\">\r\n            <div class=\"col-md-7 col-xs-7\">\r\n                <span class=\"bold-text\">ESTIMATED SHIPPING * </span><br />\r\n                <span class=\"light-text\" *ngIf=\"amount.enableFreeShipping\">\r\n                    You qualify for free shipping <br />\r\n                    because your order is over $50*\r\n                </span>\r\n            </div>\r\n            <div class=\"col-md-5 col-xs-5 lbl-amount price-text\" *ngIf=\"!amount.enableFreeShipping\">\r\n                <span class=\"prod-currency\">$</span>\r\n                <span class=\"price-value price-margin\">{{amount.shippingPrice}}</span>\r\n            </div>\r\n            <div class=\"col-md-5 col-xs-5 free\" *ngIf=\"amount.enableFreeShipping\">\r\n                <span class=\"bold-text\">FREE</span>\r\n            </div>\r\n        </div>\r\n\r\n        <div class=\"row price-row-3\">\r\n            <div class=\"col-md-7 col-xs-7\">\r\n                <span class=\"bolder-text\">ESTIMATED TOTAL </span> <br />\r\n                <span class=\"light-text\">\r\n                    Tax will be applied during checkout\r\n                </span>\r\n\r\n            </div>\r\n            <div class=\"col-md-5 col-xs-5 lbl-amount price-text-bold\">\r\n                <span class=\"prod-currency\">$</span>\r\n                <span class=\"price-value price-margin\">{{amount.netAmount}}</span>\r\n            </div>\r\n        </div> \r\n\r\n        <div class=\"row price-row-2 row-swap\">\r\n            <div class=\"col-md-10 continue-shopping col-xs-12 centered top-margin\"> <a routerlink=\"/\" href=\"/\"> CONTINUE SHOPPING</a> </div>\r\n            <div class=\"col-md-2 col-xs-12 centered\"> <button class=\"btn-primary btn broad\" onclick=\"javascript:void()\"> CHECKOUT</button> </div>\r\n        </div>\r\n\r\n        <div class=\"row price-row-2 row-swap\">\r\n            <div class=\"col-md-8 align-right col-xs-12 centered\">\r\n                <img src=\"/assets/lock.jpg\" />\r\n            </div>\r\n            <div class=\"col-md-4 light-text bottom-text col-xs-12 centered\">\r\n                 Secure checkout. Shopping is always safe &amp; secure.\r\n            </div>\r\n        </div>\r\n\r\n        <div class=\"row hidden-md-up top-border light-text centered extra-pad\" style=\"margin-top:10px\">\r\n            <span> SIGN IN </span> to you cart and have access to your items on mobile, tablet and desktop.\r\n        </div>\r\n\r\n    </div>\r\n\r\n</div>\r\n\r\n<div class=\"row vspace col-xs-12 colmd-12 align-center\">\r\n    Powered By <a href=\"https://github.com/rahul-openstack\">Rahul Srivastava</a>\r\n</div>\r\n\r\n    <modal #modal>\r\n        <style type=\"text/css\">\r\n\r\n\r\n        @media (min-width: 768px) {\r\n            .modal-prod-name{\r\n            text-align: center;\r\n            }\r\n            \r\n        .modal-name{\r\n            color: #b2b2b2;\r\n            font-size: 15px;\r\n            font-weight: 700;\r\n            margin-left: -14px;\r\n            text-align: center;\r\n            margin-bottom:5px;\r\n            border-top: 5px solid #e1e1e1;\r\n            padding-top:13px;\r\n        }\r\n        }\r\n\r\n\r\n        @media (max-width: 767px) {\r\n            .modal-prod-name{\r\n            text-align: center;\r\n            font-size:16px;\r\n            }\r\n\r\n            \r\n            .modal-name{\r\n                color: #b2b2b2;\r\n                font-size: 10px;\r\n                font-weight: 700;\r\n                margin-left: -14px;\r\n                text-align: center;\r\n                margin-bottom:5px;\r\n                border-top: 5px solid #e1e1e1;\r\n                padding-top:13px;\r\n            }\r\n\r\n            .modal-content{\r\n                width:317px !important;\r\n            }\r\n        }\r\n\r\n        \r\n\r\n        \r\n        .modal-price-value{\r\n            padding: 0;\r\n            vertical-align: text-bottom;\r\n        }\r\n\r\n        .modal-price-text{\r\n            color: #808080;\r\n            font-size: 50px;\r\n            font-weight: 600;\r\n            padding: 0 0 0 5px;\r\n            text-align:center;\r\n            margin-bottom:5px;\r\n        }\r\n\r\n        .modal-prod-currency{\r\n            color: #808080;\r\n            font-size: 38px;\r\n            font-weight: 500;\r\n            vertical-align:text-top;\r\n        }\r\n\r\n        .modal-table{\r\n            width:100%;\r\n            height:300px!important;\r\n        }\r\n\r\n        .modal-light-text{\r\n             color: #808080;\r\n            font-size: 11px;\r\n            font-weight: 400;\r\n            text-align:center;\r\n            text-decoration:underline;\r\n        }\r\n\r\n        .modal-center{\r\n            text-align:center;\r\n            margin-bottom:15px;\r\n        }\r\n            \r\n        .modal-box {\r\n                display: inline-block;\r\n            height: 18px;\r\n            margin-left: 10px;\r\n            width: 34px;\r\n        }\r\n        .modal-box-big {\r\n                display: inline-block;\r\n            height: 24px;\r\n            margin-left: 10px;\r\n            width: 39px;\r\n        }\r\n        </style>\r\n        <modal-header [show-close]=\"true\">\r\n            \r\n        </modal-header>\r\n        <modal-body>\r\n          \r\n                <table class=\"modal-table\">\r\n                    <tr>\r\n                        <td>\r\n                        \r\n                            <div class=\"modal-prod-name\"> <span class=\"modal-name\">{{ modalname | uppercase }}</span></div>\r\n                           \r\n                            <div class=\"modal-price-text\"><span class=\"modal-prod-currency\"> $</span> <span class=\"modal-price-value\"> {{ productprice }}</span> </div>\r\n                            <div class=\"modal-center\">\r\n                                <div *ngFor=\"let color of colors\" style=\"display:inline-block;\">\r\n                                    <a id=\"prod-{{color.name}}\" (click)=\"selectColor(color.hexcode)\"><div class=\"modal-box\" [style.background-color]=\"color.hexcode\" class=\"{{productColor==color.hexcode ? 'modal-box-big' : 'modal-box'}}\"></div></a>\r\n                                </div>\r\n                            </div>\r\n                            <div class=\"modal-center\">\r\n                                <select [(ngModel)]=\"productSize\" (ngModelChange)=\"enableEditing(productSize,productColor)\">\r\n                                    <option value=\"\"></option>\r\n                                    <option *ngFor=\"let size of sizes\" value={{size.code}}>Size:&nbsp;{{size.name}}</option>\r\n                                </select>\r\n\r\n                                Quantity:\r\n                                <select [(ngModel)]=\"productQty\" (ngModelChange)=\"enableEditing(productSize,productColor)\">\r\n                                    <option *ngFor=\"let qty of [1,2,3,4,5]\" value={{qty}}>{{qty}}</option>\r\n                                </select>\r\n                            </div>\r\n                            <div class=\"modal-center\"><button class=\"btn btn-primary\" type=\"button\" (click)=\"modal.close();editProduct(product)\" [disabled]=\"!isEditing\">Edit</button></div>\r\n                            <div class=\"modal-light-text\">See product details</div>\r\n                                \r\n\r\n                        </td>\r\n                        <td>\r\n                        <div style=\"display:inline-block;text-align:center\">\r\n                            <img src=\"/assets/{{imagepath}}\" />\r\n                        </div></td>\r\n                    </tr>\r\n                </table>\r\n                \r\n           \r\n                \r\n        </modal-body>\r\n\r\n    </modal>\r\n\r\n"
-
-/***/ },
+/* 678 */,
 /* 679 */
 /***/ function(module, exports) {
 
@@ -64322,6 +64017,378 @@ if (__WEBPACK_IMPORTED_MODULE_3__environments_environment__["a" /* environment *
 }
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__["a" /* platformBrowserDynamic */])().bootstrapModule(__WEBPACK_IMPORTED_MODULE_4__app___["a" /* AppModule */]);
 
+
+/***/ },
+/* 709 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return User; });
+var User = (function () {
+    function User() {
+    }
+    return User;
+}());
+
+
+/***/ },
+/* 710 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_toPromise__ = __webpack_require__(685);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_toPromise___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_add_operator_toPromise__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__user__ = __webpack_require__(709);
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return ActorDataService; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var ActorDataService = (function () {
+    function ActorDataService(http) {
+        this.http = http;
+        this.actorsUrl = 'http://localhost:4000/api/actor';
+        this.user = new __WEBPACK_IMPORTED_MODULE_3__user__["a" /* User */]();
+    }
+    ActorDataService.prototype.getActors = function () {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('x-access-token', currentUser.token);
+        return this.http.get(this.actorsUrl, { headers: headers }).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
+    };
+    ActorDataService.prototype.getActor = function (id) {
+        return this.getActors().then(function (actors) { return actors.find(function (actor) { return actor.actor_id == id; }); });
+    };
+    ActorDataService.prototype.post = function (actor) {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('x-access-token', currentUser.token);
+        return this.http.post(this.actorsUrl, JSON.stringify(actor), { headers: headers }).toPromise().then(function (res) { return res.status == 201; }).catch(this.handleError);
+    };
+    ActorDataService.prototype.put = function (actor) {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('x-access-token', currentUser.token);
+        var url = this.actorsUrl + "/" + actor.actor_id;
+        return this.http.put(url, JSON.stringify(actor), { headers: headers }).toPromise().then(function () { return actor; }).catch(this.handleError);
+    };
+    ActorDataService.prototype.delete = function (actor) {
+        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('x-access-token', currentUser.token);
+        var url = this.actorsUrl + "/" + actor.actor_id;
+        return this.http.delete(url, { headers: headers }).toPromise().catch(this.handleError);
+    };
+    ActorDataService.prototype.save = function (actor) {
+        if (actor.actor_id) {
+            return this.put(actor);
+        }
+        else {
+            return this.post(actor);
+        }
+    };
+    ActorDataService.prototype.handleError = function (error) {
+        console.log('An error occured: ', error);
+        return Promise.reject("error message: " + error);
+    };
+    ActorDataService = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Injectable"])(), 
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Http */]) === 'function' && _a) || Object])
+    ], ActorDataService);
+    return ActorDataService;
+    var _a;
+}());
+
+
+/***/ },
+/* 711 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return Actor; });
+var Actor = (function () {
+    function Actor() {
+    }
+    return Actor;
+}());
+
+
+/***/ },
+/* 712 */
+/***/ function(module, exports) {
+
+module.exports = "<br/>\r\n<h3>Details for Actor</h3>\r\n<div class=\"form-group\">\r\n<div *ngIf=\"isError\" style=\"text-align:left;padding-left:10px;font-size:14px;color:red;\"> {{errorMessage}} </div>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"title\">Actor Name</label>\r\n  <input type=\"text\" [(ngModel)]=\"actor.name\" class=\"form-control\" id=\"title\" placeholder=\"Actor Name Here\"/>\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"year\">Age</label>\r\n    <input type=\"text\" [(ngModel)]=\"actor.age\" class=\"form-control\" id=\"age\" placeholder=\"When was the actor released?\" />\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"director\">Gender</label>\r\n    <div *ngFor=\"let gender of genders\">\r\n        <label>\r\n            <input type=\"radio\" name=\"gender\" [(ngModel)]=\"actor.gender\"\r\n                   [value]=\"gender.value\">\r\n            {{gender.display}}\r\n        </label>\r\n    </div>\r\n\r\n</div>\r\n<div class=\"form-group\">\r\n  <label for=\"genre\">Agent</label>\r\n    <input type=\"text\" [(ngModel)]=\"actor.agent\" class=\"form-control\" id=\"agent\" placeholder=\"Agent\" />\r\n</div>\r\n<div class=\"form-group\">\r\n    <label for=\"genre\">Agency</label>\r\n    <input type=\"text\" [(ngModel)]=\"actor.agency\" class=\"form-control\" id=\"agency\" placeholder=\"Agency\" />\r\n</div>\r\n\r\n<div class=\"form-group\">\r\n  <input (click)=\"saveActor()\" type=\"submit\" class=\"btn btn-primary\" value=\"Save Actor\"/>\r\n</div>"
+
+/***/ },
+/* 713 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__(136);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_actor__ = __webpack_require__(711);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__ = __webpack_require__(710);
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return ActorCreatorComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var ActorCreatorComponent = (function () {
+    function ActorCreatorComponent(router, actorDataService) {
+        this.router = router;
+        this.actorDataService = actorDataService;
+        this.actor = new __WEBPACK_IMPORTED_MODULE_2__shared_actor__["a" /* Actor */]();
+        this.isError = false;
+        this.errorMessage = '';
+        this.genders = [
+            { value: 'F', display: 'Female' },
+            { value: 'M', display: 'Male' }
+        ];
+    }
+    ActorCreatorComponent.prototype.saveActor = function () {
+        var _this = this;
+        if (this.actor.name == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid name for the Actor.";
+        }
+        if (this.actor.gender == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid gender (M or F) for the Actor.";
+        }
+        if (this.actor.age == null || !Number(this.actor.age) || this.actor.age < 0 || this.actor.age > 125) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid age for the Actor (0-125).";
+        }
+        if (!this.isError) {
+            this.actorDataService.save(this.actor).then(function (res) {
+                _this.router.navigate(['/actors']);
+            }).catch(function (error) { return _this.error = error; });
+        }
+    };
+    ActorCreatorComponent = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+            template: __webpack_require__(712)
+        }), 
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* Router */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* Router */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__["a" /* ActorDataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__["a" /* ActorDataService */]) === 'function' && _b) || Object])
+    ], ActorCreatorComponent);
+    return ActorCreatorComponent;
+    var _a, _b;
+}());
+
+
+/***/ },
+/* 714 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__(136);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_actor__ = __webpack_require__(711);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__ = __webpack_require__(710);
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return ActorEditorComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var ActorEditorComponent = (function () {
+    function ActorEditorComponent(router, route, actorDataService) {
+        this.router = router;
+        this.route = route;
+        this.actorDataService = actorDataService;
+        this.actor = new __WEBPACK_IMPORTED_MODULE_2__shared_actor__["a" /* Actor */]();
+        this.isError = false;
+        this.errorMessage = '';
+        this.genders = [
+            { value: 'F', display: 'Female' },
+            { value: 'M', display: 'Male' }
+        ];
+    }
+    ActorEditorComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        var id = this.route.params.forEach(function (params) {
+            var id = +params['id'];
+            _this.actorDataService.getActor(id).then(function (actor) { return _this.actor = actor; });
+        });
+    };
+    ActorEditorComponent.prototype.saveActor = function () {
+        var _this = this;
+        if (this.actor.name == null || this.actor.name == "") {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid name for the Actor.";
+        }
+        if (this.actor.gender == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid gender (M or F) for the Actor.";
+        }
+        if (this.actor.age == null || !Number(this.actor.age) || this.actor.age < 0 || this.actor.age > 125) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid age for the Actor (0-125).";
+        }
+        if (!this.isError) {
+            this.actorDataService.save(this.actor).then(function (res) {
+                _this.router.navigate(['/actors']);
+            }).catch(function (error) { return _this.error = error; });
+        }
+    };
+    ActorEditorComponent = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+            template: __webpack_require__(712)
+        }), 
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* Router */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* Router */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* ActivatedRoute */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* ActivatedRoute */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__["a" /* ActorDataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__["a" /* ActorDataService */]) === 'function' && _c) || Object])
+    ], ActorEditorComponent);
+    return ActorEditorComponent;
+    var _a, _b, _c;
+}());
+
+
+/***/ },
+/* 715 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__(136);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_actor__ = __webpack_require__(711);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__ = __webpack_require__(710);
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return ActorViewerComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var ActorViewerComponent = (function () {
+    function ActorViewerComponent(route, actorDataService) {
+        this.route = route;
+        this.actorDataService = actorDataService;
+        this.actor = new __WEBPACK_IMPORTED_MODULE_2__shared_actor__["a" /* Actor */]();
+    }
+    ActorViewerComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        var id = this.route.params.forEach(function (params) {
+            var id = +params['id'];
+            _this.actorDataService.getActor(id).then(function (actor) {
+                _this.actor = actor;
+            });
+        });
+    };
+    ActorViewerComponent = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+            template: __webpack_require__(718)
+        }), 
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* ActivatedRoute */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* ActivatedRoute */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__["a" /* ActorDataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__shared_actor_data_service__["a" /* ActorDataService */]) === 'function' && _b) || Object])
+    ], ActorViewerComponent);
+    return ActorViewerComponent;
+    var _a, _b;
+}());
+
+
+/***/ },
+/* 716 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_actor_data_service__ = __webpack_require__(710);
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return ActorComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var ActorComponent = (function () {
+    function ActorComponent(actorDataService) {
+        this.actorDataService = actorDataService;
+        this.actors = [];
+    }
+    ActorComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.actorDataService.getActors().then(function (actors) { _this.actors = actors; });
+    };
+    ActorComponent.prototype.deleteActor = function (actor, event) {
+        var _this = this;
+        event.stopPropagation();
+        debugger;
+        this.actorDataService.delete(actor).then(function (res) {
+            _this.actors = _this.actors.filter(function (m) { return m != actor; });
+        }).catch(function (error) { return _this.error = error; });
+    };
+    ActorComponent = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+            selector: 'app-actor',
+            template: __webpack_require__(719),
+            styles: [__webpack_require__(717)]
+        }), 
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__shared_actor_data_service__["a" /* ActorDataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__shared_actor_data_service__["a" /* ActorDataService */]) === 'function' && _a) || Object])
+    ], ActorComponent);
+    return ActorComponent;
+    var _a;
+}());
+
+
+/***/ },
+/* 717 */
+/***/ function(module, exports) {
+
+module.exports = "body {\r\n  font-family: \"Trebuchet MS\";\r\n}\r\n\r\np{\r\n    padding: 50px;\r\n    font-size: 32px;\r\n    font-weight: bold;\r\n    text-align: center;\r\n    background: #dbdfe5;\r\n}\r\n\r\n.vspace{\r\n    margin-top:25px;\r\n}\r\n\r\n\r\n.odd{\r\n \r\n\r\n}\r\n.even{\r\n   \r\n}\r\n\r\n.rowCover{\r\n   padding:20px\r\n}\r\n\r\n.rowBorder{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    padding-bottom: 30px;\r\n}\r\n\r\n\r\n.rowBorder-alt{\r\n    border-bottom: 3px solid #e1e1e1;\r\n    padding-bottom: 15px;\r\n    margin-left:10px;\r\n}\r\n\r\n.shopping-head\r\n{\r\n    color: #a7a7a7;\r\n    font-family: \"Trebuchet MS\";\r\n    font-size: 48px;\r\n    font-style: normal;\r\n    font-weight: normal;\r\n    margin-bottom: 20px;\r\n    padding: 27px 0 10px 30px;\r\n\r\n}\r\n\r\n.border_text{\r\n    border:1px solid solid;\r\n}\r\n\r\n.header-border{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 40px 0 9px;\r\n}\r\n\r\n.header-border-alt{\r\n    border-bottom: 5px solid #e1e1e1;\r\n    color: #a1a1a1;\r\n    font-size: 14px;\r\n    height: 60px;\r\n    margin-bottom: 15px;    \r\n    padding: 12px 40px 0 9px;\r\n    margin-left:10px;\r\n    margin-right:2px;\r\n}\r\n\r\n.cell-size{\r\n    \r\n}\r\n\r\n.cell-qty{\r\n    \r\n}\r\n\r\n.prod-name{\r\n    color: #808080;\r\n    font-size: 14px;\r\n    font-weight: 700;\r\n    margin-left: -14px;\r\n}\r\n\r\n.prod-name-alt{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n    \r\n}\r\n\r\n\r\n.prod-info{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    \r\n}\r\n\r\n.prod-style{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n    margin-left: -14px;\r\n}\r\n\r\n\r\n.prod-action{\r\n    color: #60767c;\r\n    font-size: 13px;\r\n    font-weight: normal;\r\n    margin-left: -34px;\r\n    margin-top: 60px;\r\n}\r\n\r\n\r\n.prod-action-alt{\r\n    text-align:center;\r\n    color: #60767c;\r\n    font-size: 12px;\r\n    font-weight: normal;\r\n    margin-left: -5px;\r\n}\r\n\r\n\r\n.input-qty{\r\n    width:28px;\r\n    padding:1px 2px 3px 4px;\r\n    padding: 0 0 2px 10px;\r\n    width: 34px;\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 500;\r\n}\r\n\r\n.prod-size{\r\n    color: #808080;\r\n    font-size: 13px;\r\n    font-weight: 600;\r\n    padding: 2px 0 0 19px;\r\n}\r\n\r\n\r\n.prod-qty{\r\n    padding: 0;\r\n}\r\n\r\n\r\n.prod-qty-alt{\r\n        padding: 6px 0px 0px 16px;\r\n        color: #808080;\r\n        font-size: 13px;\r\n        font-weight: 400;\r\n}\r\n\r\n.price-value{\r\n    padding: 0;\r\n    vertical-align: text-bottom;\r\n}\r\n\r\n.price-text-alt{\r\n   color: #808080;\r\n    font-size: 21px;\r\n    font-weight: 500;\r\n    margin-left: 8px;\r\n    padding: 3px 0px 15px 5px;\r\n}\r\n\r\n.prod-currency{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n.prod-currency-alt{\r\n     color: #808080;\r\n    font-size: 18px;\r\n    font-weight: 500;\r\n    margin-right: -6px;\r\n    vertical-align: text-top;\r\n}\r\n.side-text-1{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 600;\r\n    padding: 0px 0px 20px 0px;\r\n    margin-top: 30px;\r\n}\r\n\r\n.side-text-2{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    padding: 0px 0px 20px 0px;\r\n}\r\n\r\n.side-text-3{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 300;\r\n    text-decoration:underline;\r\n    padding: 0px 0px 20px 0px;\r\n}\r\n\r\n.btnApply{\r\n    width:35%;\r\n    background-color:white;\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n}\r\n\r\n.txtPromotion{\r\n    width:60%;\r\n     color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 500;\r\n}\r\n\r\n.bold-text{\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 700;\r\n    font-family: \"Trebuchet MS\"\r\n}\r\n\r\n\r\n.bolder-text{\r\n    color: #808080;\r\n    font-size: 16px;\r\n    font-weight: 900;\r\n    font-family: \"Trebuchet MS\"\r\n}\r\n\r\n\r\n.light-text{\r\n    color: #808080;\r\n    font-size: 11px;\r\n    font-weight: 400;\r\n}\r\n\r\n\r\n\r\n.lbl-amount{\r\n    text-align:right;\r\n}\r\n\r\n.price-row{\r\n    margin-top:35px;\r\n}\r\n\r\n\r\n\r\n\r\n.top-border{\r\n    border-top: 3px solid #e1e1e1;\r\n}\r\n\r\n\r\n.align-center{\r\n    text-align:center;\r\n    color: #808080;\r\n    font-size: 12px;\r\n    font-weight: 400;\r\n}\r\n\r\n@media (min-width: 768px) {\r\n\r\n    \r\n.link{\r\n    padding: 0 20px;\r\n    cursor:pointer;\r\n}\r\n\r\n.price-row-3{\r\n    margin-top:30px;\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    padding-top:10px;\r\n}\r\n\r\n    \r\n    .dvPromotion{\r\n        border-bottom: 5px solid #e1e1e1;\r\n        margin-top:30px;\r\n        height:73px;\r\n    }\r\n\r\n    .price-text-bold{\r\n       color: #808080;\r\n        font-size: 25px;\r\n        font-weight: bold;\r\n        margin-left: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    .price-margin{\r\n        margin-right:60px;\r\n    }\r\n\r\n    .continue-shopping{\r\n        text-align:right;\r\n        padding-top:10px;\r\n        text-decoration:underline;\r\n    }\r\n\r\n    .align-right{\r\n      text-align:right;\r\n  }\r\n    .bottom-text{\r\n        margin-top:4px;\r\n        text-align:right;\r\n    }\r\n\r\n    .price-row-2{\r\n    margin-top:30px;\r\n    }\r\n\r\n    \r\n    .price-text{\r\n       color: #808080;\r\n        font-size: 21px;\r\n        font-weight: 500;\r\n        margin-left: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n\r\n    .free{\r\n        text-align:right;padding-right:80px;\r\n    }\r\n}\r\n\r\n@media (max-width: 767px) {\r\n    /* CSS goes here */\r\n    .free{\r\n        text-align:right;padding-right:40px;\r\n    }\r\n    \r\n.link{\r\n    padding: 0 13px;\r\n    cursor:pointer;\r\n}\r\n\r\n    \r\n.price-row-3{\r\n    margin-top:30px;\r\n    border-bottom: 5px solid #e1e1e1;\r\n    border-top: 2px solid #e1e1e1;\r\n    padding-top:10px;\r\n    margin-left:2px;\r\n    margin-right:4px;\r\n}\r\n\r\n    \r\n    .dvPromotion{\r\n        border-bottom: 5px solid #e1e1e1;\r\n        margin-top:30px;\r\n        height:73px;\r\n        margin-left:12px;\r\n    }\r\n    \r\n    .price-text-bold{\r\n       color: #808080;\r\n        font-size: 21px;\r\n        font-weight: bold;\r\n        margin-left: -13px;\r\n        margin-top: -13px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    .price-text{\r\n       color: #808080;\r\n        font-size: 19px;\r\n        font-weight: 500;\r\n        margin-left: -13px;\r\n        margin-top: -14px;\r\n        padding: 0 0 0 5px;\r\n    }\r\n    \r\n    .price-margin{\r\n        margin-right:5px;\r\n    }    \r\n    .centered{\r\n        text-align:center!important;\r\n    }\r\n\r\n    .broad{\r\n        width:90%;\r\n    }\r\n\r\n    .top-margin{\r\n        margin-top: 5px;\r\n    }\r\n\r\n    .row-swap {\r\n    display: flex;\r\n    flex-direction: column\r\n  }\r\n  .row-swap > div:first-of-type {\r\n    order: 1;\r\n  }\r\n\r\n  \r\n.price-row-2{\r\n    margin-top:10px;\r\n    \r\n}\r\n\r\n.extra-pad{\r\n    padding:0px 45px 0px 45px;\r\n    margin-left:10px;\r\n    margin-right:10px;\r\n}\r\n  \r\n}\r\n"
+
+/***/ },
+/* 718 */
+/***/ function(module, exports) {
+
+module.exports = "<h3>Details for {{actor.name}}</h3>\r\n<table class=\"table\">\r\n  <tr>\r\n    <td>Actor Name</td>\r\n    <td>{{actor.name}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Age</td>\r\n    <td>{{actor.age}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Gender</td>\r\n    <td>{{actor.gender}}</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Agent</td>\r\n    <td>{{actor.agent}}</td>\r\n  </tr>\r\n  <tr>\r\n       <td>Agency</td>\r\n       <td>{{actor.agency}}</td>\r\n  </tr>\r\n</table>\r\n<div>\r\n  <a class=\"btn btn-primary\" [routerLink]=\"['/actors', actor.actor_id, 'edit']\">Edit</a>\r\n</div>"
+
+/***/ },
+/* 719 */
+/***/ function(module, exports) {
+
+module.exports = "<br>\r\n<h4>Overview of Actors</h4>\r\n<br>\r\n\r\n<table class=\"table\">\r\n  <tr>\r\n  <td align=\"right\" colspan=\"2\"> <div align=\"right\"><a [routerLink]=\"['/actors/new']\" class=\"btn-primary btn-lg\">Add New Actor</a></div> </td>\r\n  </tr>\r\n  <tr *ngFor=\"let actor of actors\">\r\n    <td>{{actor.name}}</td>\r\n    <td align=\"right\">\r\n      <a class=\"btn btn-primary\" [routerLink]=\"['/actors', actor.actor_id, 'view']\">View</a>\r\n      <a class=\"btn btn-danger\"  (click)=\"deleteActor(actor, $event)\">Delete</a>\r\n    </td>\r\n  </tr>\r\n</table>\r\n\r\n\r\n\r\n\r\n"
 
 /***/ }
 ],[705]);

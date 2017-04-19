@@ -6,9 +6,7 @@ import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { OrderComponent } from './order/order.component';
-import { DataService } from './services/data.service';
+
 import { TitleCase } from './services/titlecase.pipe';
 
 
@@ -18,40 +16,43 @@ import { MovieEditorComponent } from './movie/movie-editor.component';
 import { MovieCreatorComponent } from './movie/movie-creator.component';
 import { MovieDataService } from './shared/movie-data.service';
 
+import { ActorComponent } from './actor/actor.component';
+import { ActorViewerComponent } from './actor/actor-viewer.component';
+import { ActorEditorComponent } from './actor/actor-editor.component';
+import { ActorCreatorComponent } from './actor/actor-creator.component';
+import { ActorDataService } from './shared/actor-data.service';
+
 
 
 import { ToastComponent } from './shared/toast/toast.component';
 
 const routing = RouterModule.forRoot([
-    { path: '',      component: DashboardComponent },
-    { path: 'order', component: OrderComponent },
-    {
-        path: 'movies',
-        component: OrderComponent
-    },
-    {
-        path: 'movies/:id/view',
-        component: MovieViewerComponent
-    },
-    {
-        path: 'movies/:id/edit',
-        component: MovieEditorComponent
-    },
-    {
-        path: 'movies/new',
-        component: MovieCreatorComponent
-    }
+    { path: '',      component: MovieComponent },
+    { path: 'movies', component: MovieComponent },
+    { path: 'movies/:id/view', component: MovieViewerComponent },
+    { path: 'movies/:id/edit', component: MovieEditorComponent },
+    { path: 'movies/new', component: MovieCreatorComponent },
+    { path: 'actors', component: ActorComponent },
+    { path: 'actors/:id/view', component: ActorViewerComponent },
+    { path: 'actors/:id/edit', component: ActorEditorComponent },
+    { path: 'actors/new', component: ActorCreatorComponent }
+
 ]);
 
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent,
-      OrderComponent,
+
       MovieComponent,
       MovieViewerComponent,
       MovieCreatorComponent,
       MovieEditorComponent,
+
+      ActorComponent,
+      ActorViewerComponent,
+      ActorCreatorComponent,
+      ActorEditorComponent,
+
       ToastComponent,
       TitleCase
   ],
@@ -64,8 +65,8 @@ const routing = RouterModule.forRoot([
       ModalModule
   ],
   providers: [
-      DataService,
       MovieDataService,
+      ActorDataService,
       ToastComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

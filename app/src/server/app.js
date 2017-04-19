@@ -23,18 +23,13 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log('Connected to MongoDB');
 
- // APIs
-  // select all
- 
-  require('./services/shoppingcart.service.js')(app);
-
   // all other routes are handled by Angular
   app.get('/*', function(req, res) {
     res.sendFile(path.join(__dirname,'/../../dist/index.html'));
   });
 
   app.listen(app.get('port'), function() {
-    console.log('Shopping Cart APP listening on port '+app.get('port'));
+    console.log('Movies APP listening on port '+app.get('port'));
   });
 });
 

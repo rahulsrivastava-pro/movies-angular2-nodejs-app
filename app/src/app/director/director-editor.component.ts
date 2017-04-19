@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, Params, ActivatedRoute } from '@angular/router';
 
 import { Movie } from '../shared/movie';
 import { MovieDataService } from '../shared/movie-data.service';
@@ -7,14 +7,24 @@ import { MovieDataService } from '../shared/movie-data.service';
 @Component({
     templateUrl: './movie-creator.component.html'
 })
-export class MovieCreatorComponent {
+export class MovieEditorComponent implements OnInit {
   movie: Movie = new Movie();
   error: any;
   isError = false;
-  errorMessage = '';    
+  errorMessage = ''; 
 
-  constructor(private router: Router, private movieDataService: MovieDataService) { }
- 
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private movieDataService: MovieDataService) { }
+
+  ngOnInit() {
+    let id = this.route.params.forEach((params : Params) => {
+      let id = +params['id'];
+      this.movieDataService.getMovie(id).then(movie => this.movie = movie);
+    });
+  }
+
   saveMovie() {
     if(this.movie.name == null){
       this.isError = true;
@@ -32,10 +42,9 @@ export class MovieCreatorComponent {
           this.isError = true;
           this.errorMessage = "Please provide a valid Rating for the Movie (1-5).";
       }
-    if(!this.isError){
-        this.movieDataService.save(this.movie).then(res => {
-                this.router.navigate(['/movies']);
-            }).catch(error => this.error = error);
-      }
-    }
+    this.movieDataService.save(this.movie).then(res => {
+            this.router.navigate(['/movies']);
+        }).catch(error => this.error = error);
+    
+  }
 }
