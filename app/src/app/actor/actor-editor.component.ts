@@ -29,7 +29,8 @@ export class ActorEditorComponent implements OnInit {
     });
   }
 
-  saveActor() {
+    saveActor() {
+    this.isError = false;
     if(this.actor.name == null || this.actor.name == ""){
       this.isError = true;
       this.errorMessage = "Please provide a valid name for the Actor.";

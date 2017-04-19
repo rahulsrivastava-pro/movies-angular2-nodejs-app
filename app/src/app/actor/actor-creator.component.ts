@@ -18,7 +18,8 @@ export class ActorCreatorComponent {
     ];
   constructor(private router: Router, private actorDataService: ActorDataService) { }
  
-  saveActor() {
+    saveActor() {
+        this.isError = false;
       if (this.actor.name == null) {
           this.isError = true;
           this.errorMessage = "Please provide a valid name for the Actor.";

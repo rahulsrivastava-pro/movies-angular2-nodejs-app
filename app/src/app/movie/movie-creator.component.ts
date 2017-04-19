@@ -15,8 +15,9 @@ export class MovieCreatorComponent {
 
   constructor(private router: Router, private movieDataService: MovieDataService) { }
  
-  saveMovie() {
-    if(this.movie.name == null){
+    saveMovie() {
+        this.isError = false;
+      if (this.movie.name == null || this.movie.name == ""){
       this.isError = true;
       this.errorMessage = "Please provide a valid title for the Movie.";
     }

@@ -4,13 +4,12 @@ import { Headers, Response, Http }       from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 
 import { Director } from './director';
-import { Director } from './director';
 import { User } from './user';
 
 @Injectable()
 export class DirectorDataService {
 
-  private directorUrl = 'http://localhost:4000/api/director';
+  private directorsUrl = 'http://localhost:4000/api/director';
   private user: User = new User();
 
   constructor(private http: Http) { }

@@ -1,24 +1,28 @@
-<br/>
-<h3>Details for Movie</h3>
+<br />
+<h3>Details for Director</h3>
 <div class="form-group">
-<div *ngIf="isError" style="text-align:left;padding-left:10px;font-size:14px;color:red;"> {{errorMessage}} </div>
+    <div *ngIf="isError" style="text-align:left;padding-left:10px;font-size:14px;color:red;"> {{errorMessage}} </div>
 </div>
 <div class="form-group">
-  <label for="title">Title</label>
-  <input type="text" [(ngModel)]="movie.name" class="form-control" id="title" placeholder="Movie Title Here"/>
+    <label for="title">Director Name</label>
+    <input type="text" [(ngModel)]="director.name" class="form-control" id="title" placeholder="Director Name Here" />
 </div>
 <div class="form-group">
-  <label for="year">Release Year</label>
-  <input type="text" [(ngModel)]="movie.year" class="form-control" id="year" placeholder="When was the movie released?"/>
+    <label for="year">Age</label>
+    <input type="text" [(ngModel)]="director.age" class="form-control" id="age" placeholder="When was the director released?" />
 </div>
 <div class="form-group">
-  <label for="director">Description</label>
-  <input type="text" [(ngModel)]="movie.description" class="form-control" id="director" placeholder="Description of the movie?"/>
+    <label for="director">Gender</label>
+    <div *ngFor="let gender of genders">
+        <label>
+            <input type="radio" name="gender" [(ngModel)]="director.gender"
+                   [value]="gender.value">
+            {{gender.display}}
+        </label>
+    </div>
+
 </div>
+
 <div class="form-group">
-  <label for="genre">Rating</label>
-  <input type="text" [(ngModel)]="movie.rating" class="form-control" id="genre" placeholder="Rating"/>
-</div>
-<div class="form-group">
-  <input (click)="saveMovie()" type="submit" class="btn btn-primary" value="Save Movie"/>
+    <input (click)="saveDirector()" type="submit" class="btn btn-primary" value="Save Director" />
 </div>

@@ -25,7 +25,8 @@ export class MovieEditorComponent implements OnInit {
     });
   }
 
-  saveMovie() {
+    saveMovie() {
+        this.isError = false;
     if(this.movie.name == null){
       this.isError = true;
       this.errorMessage = "Please provide a valid title for the Movie.";

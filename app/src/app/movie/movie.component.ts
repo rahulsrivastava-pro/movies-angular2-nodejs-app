@@ -7,8 +7,6 @@ import { RouterModule } from '@angular/router';
 
 import { ToastComponent } from '../shared/toast/toast.component';
 
-import { DataService } from '../services/data.service';
-
 import { Movie } from '../shared/movie';
 import { MovieDataService } from '../shared/movie-data.service';
 

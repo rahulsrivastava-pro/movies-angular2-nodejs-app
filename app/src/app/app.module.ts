@@ -7,8 +7,6 @@ import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 
-import { TitleCase } from './services/titlecase.pipe';
-
 
 import { MovieComponent } from './movie/movie.component';
 import { MovieViewerComponent } from './movie/movie-viewer.component';
@@ -22,7 +20,11 @@ import { ActorEditorComponent } from './actor/actor-editor.component';
 import { ActorCreatorComponent } from './actor/actor-creator.component';
 import { ActorDataService } from './shared/actor-data.service';
 
-
+import { DirectorComponent } from './director/director.component';
+import { DirectorViewerComponent } from './director/director-viewer.component';
+import { DirectorEditorComponent } from './director/director-editor.component';
+import { DirectorCreatorComponent } from './director/director-creator.component';
+import { DirectorDataService } from './shared/director-data.service';
 
 import { ToastComponent } from './shared/toast/toast.component';
 
@@ -32,10 +34,16 @@ const routing = RouterModule.forRoot([
     { path: 'movies/:id/view', component: MovieViewerComponent },
     { path: 'movies/:id/edit', component: MovieEditorComponent },
     { path: 'movies/new', component: MovieCreatorComponent },
+
     { path: 'actors', component: ActorComponent },
     { path: 'actors/:id/view', component: ActorViewerComponent },
     { path: 'actors/:id/edit', component: ActorEditorComponent },
-    { path: 'actors/new', component: ActorCreatorComponent }
+    { path: 'actors/new', component: ActorCreatorComponent },
+
+    { path: 'directors', component: DirectorComponent },
+    { path: 'directors/:id/view', component: DirectorViewerComponent },
+    { path: 'directors/:id/edit', component: DirectorEditorComponent },
+    { path: 'directors/new', component: DirectorCreatorComponent }
 
 ]);
 
@@ -53,10 +61,15 @@ const routing = RouterModule.forRoot([
       ActorCreatorComponent,
       ActorEditorComponent,
 
-      ToastComponent,
-      TitleCase
+      DirectorComponent,
+      DirectorViewerComponent,
+      DirectorCreatorComponent,
+      DirectorEditorComponent,
+
+      ToastComponent
   ],
-  imports: [
+    imports: [
+        RouterModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -67,6 +80,7 @@ const routing = RouterModule.forRoot([
   providers: [
       MovieDataService,
       ActorDataService,
+      DirectorDataService,
       ToastComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

@@ -7,7 +7,6 @@ import { RouterModule } from '@angular/router';
 
 import { ToastComponent } from '../shared/toast/toast.component';
 
-import { DataService } from '../services/data.service';
 
 import { Director } from '../shared/director';
 import { DirectorDataService } from '../shared/director-data.service';
@@ -26,13 +25,10 @@ export class DirectorComponent implements OnInit {
         private directorDataService: DirectorDataService) { }
 
     ngOnInit() {
-        this.directorDataService.getToken().then(res => {
-            let token = res.token;
-            localStorage.setItem('currentUser', JSON.stringify({ token: token }));
+        
             this.directorDataService.getDirectors().then(directors => 
             {this.directors = directors;}
             );
-        });
         
     }
 

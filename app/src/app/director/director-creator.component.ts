@@ -1,41 +1,41 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Movie } from '../shared/movie';
-import { MovieDataService } from '../shared/movie-data.service';
+import { Director } from '../shared/director';
+import { DirectorDataService } from '../shared/director-data.service';
 
 @Component({
-    templateUrl: './movie-creator.component.html'
+    templateUrl: './director-creator.component.html'
 })
-export class MovieCreatorComponent {
-  movie: Movie = new Movie();
-  error: any;
-  isError = false;
-  errorMessage = '';    
+export class DirectorCreatorComponent {
+    director: Director = new Director();
+    error: any;
+    isError = false;
+    errorMessage = '';
+    public genders = [
+        { value: 'F', display: 'Female' },
+        { value: 'M', display: 'Male' }
+    ];
+    constructor(private router: Router, private directorDataService: DirectorDataService) { }
 
-  constructor(private router: Router, private movieDataService: MovieDataService) { }
- 
-  saveMovie() {
-    if(this.movie.name == null){
-      this.isError = true;
-      this.errorMessage = "Please provide a valid title for the Movie.";
-    }
-    if(this.movie.description == null){
-      this.isError = true;
-      this.errorMessage = "Please provide a valid description for the Movie.";
-    }
-    if(this.movie.year == null || !Number(this.movie.year) || this.movie.year < 1800 || this.movie.year > 2017){
-          this.isError = true;
-          this.errorMessage = "Please provide a valid Year for the Movie (1800-2017).";
-      }
-      if(this.movie.rating == null || !Number(this.movie.rating) || this.movie.rating < 1 || this.movie.rating > 5){
-          this.isError = true;
-          this.errorMessage = "Please provide a valid Rating for the Movie (1-5).";
-      }
-    if(!this.isError){
-        this.movieDataService.save(this.movie).then(res => {
-                this.router.navigate(['/movies']);
+    saveDirector() {
+        this.isError = false;
+        if (this.director.name == null || this.director.name == "") {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid name for the Director.";
+        }
+        if (this.director.gender == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid gender (M or F) for the Director.";
+        }
+        if (this.director.age == null || !Number(this.director.age) || this.director.age < 0 || this.director.age > 125) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid age for the Director (0-125).";
+        }
+        if (!this.isError) {
+            this.directorDataService.save(this.director).then(res => {
+                this.router.navigate(['/directors']);
             }).catch(error => this.error = error);
-      }
+        }
     }
 }

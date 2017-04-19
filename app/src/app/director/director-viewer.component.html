@@ -1,22 +1,18 @@
-<h3>Details for {{movie.name}}</h3>
+<h3>Details for {{director.name}}</h3>
 <table class="table">
-  <tr>
-    <td>Movie Title</td>
-    <td>{{movie.name}}</td>
-  </tr>
-  <tr>
-    <td>Description</td>
-    <td>{{movie.description}}</td>
-  </tr>
-  <tr>
-    <td>Release Year</td>
-    <td>{{movie.year}}</td>
-  </tr>
-  <tr>
-    <td>Rating</td>
-    <td>{{movie.rating}}</td>
-  </tr>
+    <tr>
+        <td>Director Name</td>
+        <td>{{director.name}}</td>
+    </tr>
+    <tr>
+        <td>Age</td>
+        <td>{{director.age}}</td>
+    </tr>
+    <tr>
+        <td>Gender</td>
+        <td>{{director.gender}}</td>
+    </tr>
 </table>
 <div>
-  <a class="btn btn-primary" [routerLink]="['/movies', movie.movie_id, 'edit']">Edit</a>
+    <a class="btn btn-primary" [routerLink]="['/directors', director.director_id, 'edit']">Edit</a>
 </div>
