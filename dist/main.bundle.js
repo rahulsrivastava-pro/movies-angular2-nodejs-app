@@ -13088,8 +13088,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ActorDataService = (function () {
     function ActorDataService(http) {
         this.http = http;
-        this.actorsUrl = 'https://heroku-node-movies-api.herokuapp.com/api/actor';
-        //private actorsUrl = 'http://localhost:8080/api/actor';
+        //private actorsUrl ='https://heroku-node-movies-api.herokuapp.com/api/actor';
+        this.actorsUrl = 'http://localhost:8080/api/actor';
         this.user = new __WEBPACK_IMPORTED_MODULE_3__user__["a" /* User */]();
     }
     ActorDataService.prototype.getActors = function () {
@@ -13173,8 +13173,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var DirectorDataService = (function () {
     function DirectorDataService(http) {
         this.http = http;
-        this.directorsUrl = 'https://heroku-node-movies-api.herokuapp.com/api/director';
-        //private directorsUrl = 'http://localhost:8080/api/director';
+        //private directorsUrl ='https://heroku-node-movies-api.herokuapp.com/api/director';
+        this.directorsUrl = 'http://localhost:8080/api/director';
         this.user = new __WEBPACK_IMPORTED_MODULE_3__user__["a" /* User */]();
     }
     DirectorDataService.prototype.getDirectors = function () {
@@ -13258,8 +13258,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var MovieDataService = (function () {
     function MovieDataService(http) {
         this.http = http;
-        this.baseURL = 'https://heroku-node-movies-api.herokuapp.com/api/';
-        //private baseURL = 'http://localhost:8080/api/';
+        //private baseURL ='https://heroku-node-movies-api.herokuapp.com/api/';
+        this.baseURL = 'http://localhost:8080/api/';
         this.authUrl = this.baseURL + 'authenticate';
         this.moviesUrl = this.baseURL + 'movie';
         this.getActorsInMovieUrl = this.baseURL + 'getActorsInMovie';

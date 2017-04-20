@@ -9,8 +9,8 @@ import { User } from './user';
 @Injectable()
 export class ActorDataService {
 
-  private actorsUrl ='https://heroku-node-movies-api.herokuapp.com/api/actor';
-  //private actorsUrl = 'http://localhost:8080/api/actor';
+  //private actorsUrl ='https://heroku-node-movies-api.herokuapp.com/api/actor';
+  private actorsUrl = 'http://localhost:8080/api/actor';
   private user: User = new User();
 
   constructor(private http: Http) { }

@@ -9,8 +9,8 @@ import { User } from './user';
 @Injectable()
 export class DirectorDataService {
 
-  private directorsUrl ='https://heroku-node-movies-api.herokuapp.com/api/director';
-  //private directorsUrl = 'http://localhost:8080/api/director';
+  //private directorsUrl ='https://heroku-node-movies-api.herokuapp.com/api/director';
+  private directorsUrl = 'http://localhost:8080/api/director';
   private user: User = new User();
 
   constructor(private http: Http) { }
