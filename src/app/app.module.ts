@@ -13,6 +13,7 @@ import { MovieViewerComponent } from './movie/movie-viewer.component';
 import { MovieEditorComponent } from './movie/movie-editor.component';
 import { MovieCreatorComponent } from './movie/movie-creator.component';
 import { MovieDataService } from './shared/movie-data.service';
+import { MovieManageComponent } from './movie/movie-manage.component';
 
 import { ActorComponent } from './actor/actor.component';
 import { ActorViewerComponent } from './actor/actor-viewer.component';
@@ -33,6 +34,7 @@ const routing = RouterModule.forRoot([
     { path: 'movies', component: MovieComponent },
     { path: 'movies/:id/view', component: MovieViewerComponent },
     { path: 'movies/:id/edit', component: MovieEditorComponent },
+    { path: 'movies/:id/manage', component: MovieManageComponent },
     { path: 'movies/new', component: MovieCreatorComponent },
 
     { path: 'actors', component: ActorComponent },
@@ -55,6 +57,7 @@ const routing = RouterModule.forRoot([
       MovieViewerComponent,
       MovieCreatorComponent,
       MovieEditorComponent,
+      MovieManageComponent,
 
       ActorComponent,
       ActorViewerComponent,

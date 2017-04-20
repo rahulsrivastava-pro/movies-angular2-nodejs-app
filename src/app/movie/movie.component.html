@@ -4,13 +4,19 @@
 
 <table class="table">
   <tr>
-  <td align="right" colspan="2"> <div align="right"><a [routerLink]="['/movies/new']" class="btn-primary btn-lg">Add New Movie</a></div> </td>
+  <td align="right" colspan="2"> <div align="right"><a [routerLink]="['/movies/new']" class="nav-item nav-link">Add Movie <i class="fa fa-plus-square"></i> </a></div> </td>
   </tr>
   <tr *ngFor="let movie of movies">
     <td>{{movie.name}}</td>
     <td align="right">
-      <a class="btn btn-primary" [routerLink]="['/movies', movie.movie_id, 'view']">View</a>
-      <a class="btn btn-danger"  (click)="deleteMovie(movie, $event)">Delete</a>
+      <a class="nav-item nav-link" [routerLink]="['/movies', movie.movie_id, 'view']" title="View Movie">View <i class="fa fa-folder-o"></i>  </a>
+      &nbsp;
+      <a class="nav-item nav-link" href="javascript:void(0);" (click)="deleteMovie(movie, $event)" title="Remove Movie"> Remove <i class="fa fa-remove"></i> </a>
+       &nbsp;     
+      <a [routerLink]="['/movies', movie.movie_id, 'manage']" class="nav-item nav-link" routerLinkActive="active" title="Manage Movies">
+            Manage <i class="fa fa-gear"></i>   
+        </a>
+
     </td>
   </tr>
 </table>

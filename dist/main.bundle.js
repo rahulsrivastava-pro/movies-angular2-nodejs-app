@@ -13256,8 +13256,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var MovieDataService = (function () {
     function MovieDataService(http) {
         this.http = http;
-        this.authUrl = 'http://localhost:8080/api/authenticate';
-        this.moviesUrl = 'http://localhost:8080/api/movie';
+        this.baseURL = 'http://localhost:8080/api/';
+        this.authUrl = this.baseURL + 'authenticate';
+        this.moviesUrl = this.baseURL + 'movie';
+        this.getActorsInMovieUrl = this.baseURL + 'getActorsInMovie';
+        this.getDirectorsInMovieUrl = this.baseURL + 'getDirectorsInMovie';
+        this.associateMovieDirectorUrl = this.baseURL + 'associateMovieDirector';
+        this.associateMovieActorUrl = this.baseURL + 'associateMovieActor';
+        this.disassociateMovieDirectorUrl = this.baseURL + 'disassociateMovieDirector';
+        this.disassociateMovieActorUrl = this.baseURL + 'disassociateMovieActor';
         this.user = new __WEBPACK_IMPORTED_MODULE_3__user__["a" /* User */]();
     }
     MovieDataService.prototype.getToken = function () {
@@ -13266,36 +13273,59 @@ var MovieDataService = (function () {
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]({ 'Content-Type': 'application/json' });
         return this.http.post(this.authUrl, JSON.stringify(this.user), { headers: headers }).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
     };
-    MovieDataService.prototype.getMovies = function () {
+    MovieDataService.prototype.fetchToken = function () {
         var currentUser = JSON.parse(localStorage.getItem('currentUser'));
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
         headers.append('Content-Type', 'application/json');
         headers.append('x-access-token', currentUser.token);
+        return headers;
+    };
+    MovieDataService.prototype.getMovies = function () {
+        var headers = this.fetchToken();
         return this.http.get(this.moviesUrl, { headers: headers }).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
     };
     MovieDataService.prototype.getMovie = function (id) {
         return this.getMovies().then(function (movies) { return movies.find(function (movie) { return movie.movie_id == id; }); });
     };
+    MovieDataService.prototype.getActorsByMovie = function (id) {
+        var headers = this.fetchToken();
+        var url = this.getActorsInMovieUrl + "/" + id;
+        return this.http.get(url, { headers: headers }).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
+    };
+    MovieDataService.prototype.getDirectorsByMovie = function (id) {
+        var headers = this.fetchToken();
+        var url = this.getDirectorsInMovieUrl + "/" + id;
+        return this.http.get(url, { headers: headers }).toPromise().then(function (response) { return response.json(); }).catch(this.handleError);
+    };
+    MovieDataService.prototype.postAssociateMovieDirector = function (movie_director) {
+        var headers = this.fetchToken();
+        return this.http.post(this.associateMovieDirectorUrl, JSON.stringify(movie_director), { headers: headers }).toPromise().then(function (res) { return res.status == 201; }).catch(this.handleError);
+    };
+    MovieDataService.prototype.postAssociateMovieActor = function (movie_actor) {
+        var headers = this.fetchToken();
+        return this.http.post(this.associateMovieActorUrl, JSON.stringify(movie_actor), { headers: headers }).toPromise().then(function (res) { return res.status == 201; }).catch(this.handleError);
+    };
+    MovieDataService.prototype.putDisAssociateMovieActor = function (movieId, actorId) {
+        var headers = this.fetchToken();
+        var url = this.disassociateMovieActorUrl + "/" + movieId + "/" + actorId;
+        return this.http.delete(url, { headers: headers }).toPromise().catch(this.handleError);
+    };
+    MovieDataService.prototype.putDisAssociateMovieDirector = function (movieId, directorId) {
+        var headers = this.fetchToken();
+        var url = this.disassociateMovieDirectorUrl + "/" + movieId + "/" + directorId;
+        return this.http.delete(url, { headers: headers }).toPromise().catch(this.handleError);
+    };
     MovieDataService.prototype.post = function (movie) {
-        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
-        headers.append('Content-Type', 'application/json');
-        headers.append('x-access-token', currentUser.token);
+        var headers = this.fetchToken();
         return this.http.post(this.moviesUrl, JSON.stringify(movie), { headers: headers }).toPromise().then(function (res) { return res.status == 201; }).catch(this.handleError);
     };
     MovieDataService.prototype.put = function (movie) {
-        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
-        headers.append('Content-Type', 'application/json');
-        headers.append('x-access-token', currentUser.token);
+        var headers = this.fetchToken();
         var url = this.moviesUrl + "/" + movie.movie_id;
         return this.http.put(url, JSON.stringify(movie), { headers: headers }).toPromise().then(function () { return movie; }).catch(this.handleError);
     };
     MovieDataService.prototype.delete = function (movie) {
-        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
-        headers.append('Content-Type', 'application/json');
-        headers.append('x-access-token', currentUser.token);
+        var headers = this.fetchToken();
         var url = this.moviesUrl + "/" + movie.movie_id;
         return this.http.delete(url, { headers: headers }).toPromise().catch(this.handleError);
     };
@@ -45320,28 +45350,7 @@ webpackEmptyContext.id = 389;
 
 
 /***/ },
-/* 390 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__polyfills_ts__ = __webpack_require__(517);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__polyfills_ts___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__polyfills_ts__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(475);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__environments_environment__ = __webpack_require__(516);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app___ = __webpack_require__(510);
-
-
-
-
-
-if (__WEBPACK_IMPORTED_MODULE_3__environments_environment__["a" /* environment */].production) {
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__angular_core__["enableProdMode"])();
-}
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__["a" /* platformBrowserDynamic */])().bootstrapModule(__WEBPACK_IMPORTED_MODULE_4__app___["a" /* AppModule */]);
-
-
-/***/ },
+/* 390 */,
 /* 391 */,
 /* 392 */,
 /* 393 */,
@@ -57983,17 +57992,18 @@ var ActorComponent = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__movie_movie_editor_component__ = __webpack_require__(512);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__movie_movie_creator_component__ = __webpack_require__(511);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__shared_movie_data_service__ = __webpack_require__(98);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__actor_actor_component__ = __webpack_require__(504);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__actor_actor_viewer_component__ = __webpack_require__(503);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__actor_actor_editor_component__ = __webpack_require__(502);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__actor_actor_creator_component__ = __webpack_require__(501);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__shared_actor_data_service__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__director_director_component__ = __webpack_require__(509);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__director_director_viewer_component__ = __webpack_require__(508);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__director_director_editor_component__ = __webpack_require__(507);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__director_director_creator_component__ = __webpack_require__(506);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__shared_director_data_service__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__shared_toast_toast_component__ = __webpack_require__(515);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__movie_movie_manage_component__ = __webpack_require__(722);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__actor_actor_component__ = __webpack_require__(504);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__actor_actor_viewer_component__ = __webpack_require__(503);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__actor_actor_editor_component__ = __webpack_require__(502);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__actor_actor_creator_component__ = __webpack_require__(501);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__shared_actor_data_service__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__director_director_component__ = __webpack_require__(509);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__director_director_viewer_component__ = __webpack_require__(508);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__director_director_editor_component__ = __webpack_require__(507);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__director_director_creator_component__ = __webpack_require__(506);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__shared_director_data_service__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__shared_toast_toast_component__ = __webpack_require__(515);
 /* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return AppModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -58027,20 +58037,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var routing = __WEBPACK_IMPORTED_MODULE_5__angular_router__["c" /* RouterModule */].forRoot([
     { path: '', component: __WEBPACK_IMPORTED_MODULE_7__movie_movie_component__["a" /* MovieComponent */] },
     { path: 'movies', component: __WEBPACK_IMPORTED_MODULE_7__movie_movie_component__["a" /* MovieComponent */] },
     { path: 'movies/:id/view', component: __WEBPACK_IMPORTED_MODULE_8__movie_movie_viewer_component__["a" /* MovieViewerComponent */] },
     { path: 'movies/:id/edit', component: __WEBPACK_IMPORTED_MODULE_9__movie_movie_editor_component__["a" /* MovieEditorComponent */] },
+    { path: 'movies/:id/manage', component: __WEBPACK_IMPORTED_MODULE_12__movie_movie_manage_component__["a" /* MovieManageComponent */] },
     { path: 'movies/new', component: __WEBPACK_IMPORTED_MODULE_10__movie_movie_creator_component__["a" /* MovieCreatorComponent */] },
-    { path: 'actors', component: __WEBPACK_IMPORTED_MODULE_12__actor_actor_component__["a" /* ActorComponent */] },
-    { path: 'actors/:id/view', component: __WEBPACK_IMPORTED_MODULE_13__actor_actor_viewer_component__["a" /* ActorViewerComponent */] },
-    { path: 'actors/:id/edit', component: __WEBPACK_IMPORTED_MODULE_14__actor_actor_editor_component__["a" /* ActorEditorComponent */] },
-    { path: 'actors/new', component: __WEBPACK_IMPORTED_MODULE_15__actor_actor_creator_component__["a" /* ActorCreatorComponent */] },
-    { path: 'directors', component: __WEBPACK_IMPORTED_MODULE_17__director_director_component__["a" /* DirectorComponent */] },
-    { path: 'directors/:id/view', component: __WEBPACK_IMPORTED_MODULE_18__director_director_viewer_component__["a" /* DirectorViewerComponent */] },
-    { path: 'directors/:id/edit', component: __WEBPACK_IMPORTED_MODULE_19__director_director_editor_component__["a" /* DirectorEditorComponent */] },
-    { path: 'directors/new', component: __WEBPACK_IMPORTED_MODULE_20__director_director_creator_component__["a" /* DirectorCreatorComponent */] }
+    { path: 'actors', component: __WEBPACK_IMPORTED_MODULE_13__actor_actor_component__["a" /* ActorComponent */] },
+    { path: 'actors/:id/view', component: __WEBPACK_IMPORTED_MODULE_14__actor_actor_viewer_component__["a" /* ActorViewerComponent */] },
+    { path: 'actors/:id/edit', component: __WEBPACK_IMPORTED_MODULE_15__actor_actor_editor_component__["a" /* ActorEditorComponent */] },
+    { path: 'actors/new', component: __WEBPACK_IMPORTED_MODULE_16__actor_actor_creator_component__["a" /* ActorCreatorComponent */] },
+    { path: 'directors', component: __WEBPACK_IMPORTED_MODULE_18__director_director_component__["a" /* DirectorComponent */] },
+    { path: 'directors/:id/view', component: __WEBPACK_IMPORTED_MODULE_19__director_director_viewer_component__["a" /* DirectorViewerComponent */] },
+    { path: 'directors/:id/edit', component: __WEBPACK_IMPORTED_MODULE_20__director_director_editor_component__["a" /* DirectorEditorComponent */] },
+    { path: 'directors/new', component: __WEBPACK_IMPORTED_MODULE_21__director_director_creator_component__["a" /* DirectorCreatorComponent */] }
 ]);
 var AppModule = (function () {
     function AppModule() {
@@ -58053,15 +58065,16 @@ var AppModule = (function () {
                 __WEBPACK_IMPORTED_MODULE_8__movie_movie_viewer_component__["a" /* MovieViewerComponent */],
                 __WEBPACK_IMPORTED_MODULE_10__movie_movie_creator_component__["a" /* MovieCreatorComponent */],
                 __WEBPACK_IMPORTED_MODULE_9__movie_movie_editor_component__["a" /* MovieEditorComponent */],
-                __WEBPACK_IMPORTED_MODULE_12__actor_actor_component__["a" /* ActorComponent */],
-                __WEBPACK_IMPORTED_MODULE_13__actor_actor_viewer_component__["a" /* ActorViewerComponent */],
-                __WEBPACK_IMPORTED_MODULE_15__actor_actor_creator_component__["a" /* ActorCreatorComponent */],
-                __WEBPACK_IMPORTED_MODULE_14__actor_actor_editor_component__["a" /* ActorEditorComponent */],
-                __WEBPACK_IMPORTED_MODULE_17__director_director_component__["a" /* DirectorComponent */],
-                __WEBPACK_IMPORTED_MODULE_18__director_director_viewer_component__["a" /* DirectorViewerComponent */],
-                __WEBPACK_IMPORTED_MODULE_20__director_director_creator_component__["a" /* DirectorCreatorComponent */],
-                __WEBPACK_IMPORTED_MODULE_19__director_director_editor_component__["a" /* DirectorEditorComponent */],
-                __WEBPACK_IMPORTED_MODULE_22__shared_toast_toast_component__["a" /* ToastComponent */]
+                __WEBPACK_IMPORTED_MODULE_12__movie_movie_manage_component__["a" /* MovieManageComponent */],
+                __WEBPACK_IMPORTED_MODULE_13__actor_actor_component__["a" /* ActorComponent */],
+                __WEBPACK_IMPORTED_MODULE_14__actor_actor_viewer_component__["a" /* ActorViewerComponent */],
+                __WEBPACK_IMPORTED_MODULE_16__actor_actor_creator_component__["a" /* ActorCreatorComponent */],
+                __WEBPACK_IMPORTED_MODULE_15__actor_actor_editor_component__["a" /* ActorEditorComponent */],
+                __WEBPACK_IMPORTED_MODULE_18__director_director_component__["a" /* DirectorComponent */],
+                __WEBPACK_IMPORTED_MODULE_19__director_director_viewer_component__["a" /* DirectorViewerComponent */],
+                __WEBPACK_IMPORTED_MODULE_21__director_director_creator_component__["a" /* DirectorCreatorComponent */],
+                __WEBPACK_IMPORTED_MODULE_20__director_director_editor_component__["a" /* DirectorEditorComponent */],
+                __WEBPACK_IMPORTED_MODULE_23__shared_toast_toast_component__["a" /* ToastComponent */]
             ],
             imports: [
                 __WEBPACK_IMPORTED_MODULE_5__angular_router__["c" /* RouterModule */],
@@ -58074,9 +58087,9 @@ var AppModule = (function () {
             ],
             providers: [
                 __WEBPACK_IMPORTED_MODULE_11__shared_movie_data_service__["a" /* MovieDataService */],
-                __WEBPACK_IMPORTED_MODULE_16__shared_actor_data_service__["a" /* ActorDataService */],
-                __WEBPACK_IMPORTED_MODULE_21__shared_director_data_service__["a" /* DirectorDataService */],
-                __WEBPACK_IMPORTED_MODULE_22__shared_toast_toast_component__["a" /* ToastComponent */]
+                __WEBPACK_IMPORTED_MODULE_17__shared_actor_data_service__["a" /* ActorDataService */],
+                __WEBPACK_IMPORTED_MODULE_22__shared_director_data_service__["a" /* DirectorDataService */],
+                __WEBPACK_IMPORTED_MODULE_23__shared_toast_toast_component__["a" /* ToastComponent */]
             ],
             schemas: [__WEBPACK_IMPORTED_MODULE_1__angular_core__["CUSTOM_ELEMENTS_SCHEMA"]],
             bootstrap: [__WEBPACK_IMPORTED_MODULE_6__app_component__["a" /* AppComponent */]]
@@ -61881,7 +61894,7 @@ module.exports = "<h3>Details for {{movie.name}}</h3>\r\n<table class=\"table\">
 /* 691 */
 /***/ function(module, exports) {
 
-module.exports = "<br>\r\n<h4>Movies Dashboard</h4>\r\n<br>\r\n\r\n<table class=\"table\">\r\n  <tr>\r\n  <td align=\"right\" colspan=\"2\"> <div align=\"right\"><a [routerLink]=\"['/movies/new']\" class=\"btn-primary btn-lg\">Add New Movie</a></div> </td>\r\n  </tr>\r\n  <tr *ngFor=\"let movie of movies\">\r\n    <td>{{movie.name}}</td>\r\n    <td align=\"right\">\r\n      <a class=\"btn btn-primary\" [routerLink]=\"['/movies', movie.movie_id, 'view']\">View</a>\r\n      <a class=\"btn btn-danger\"  (click)=\"deleteMovie(movie, $event)\">Delete</a>\r\n    </td>\r\n  </tr>\r\n</table>\r\n\r\n\r\n\r\n\r\n"
+module.exports = "<br>\r\n<h4>Movies Dashboard</h4>\r\n<br>\r\n\r\n<table class=\"table\">\r\n  <tr>\r\n  <td align=\"right\" colspan=\"2\"> <div align=\"right\"><a [routerLink]=\"['/movies/new']\" class=\"nav-item nav-link\">Add Movie <i class=\"fa fa-plus-square\"></i> </a></div> </td>\r\n  </tr>\r\n  <tr *ngFor=\"let movie of movies\">\r\n    <td>{{movie.name}}</td>\r\n    <td align=\"right\">\r\n      <a class=\"nav-item nav-link\" [routerLink]=\"['/movies', movie.movie_id, 'view']\" title=\"View Movie\">View <i class=\"fa fa-folder-o\"></i>  </a>\r\n      &nbsp;\r\n      <a class=\"nav-item nav-link\" href=\"javascript:void(0);\" (click)=\"deleteMovie(movie, $event)\" title=\"Remove Movie\"> Remove <i class=\"fa fa-remove\"></i> </a>\r\n       &nbsp;     \r\n      <a [routerLink]=\"['/movies', movie.movie_id, 'manage']\" class=\"nav-item nav-link\" routerLinkActive=\"active\" title=\"Manage Movies\">\r\n            Manage <i class=\"fa fa-gear\"></i>   \r\n        </a>\r\n\r\n    </td>\r\n  </tr>\r\n</table>\r\n\r\n\r\n\r\n\r\n"
 
 /***/ },
 /* 692 */
@@ -64752,7 +64765,217 @@ if (_global['navigator'] && _global['navigator'].geolocation) {
 /* 718 */
 /***/ function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(390);
+module.exports = __webpack_require__(721);
+
+
+/***/ },
+/* 719 */,
+/* 720 */,
+/* 721 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__polyfills_ts__ = __webpack_require__(517);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__polyfills_ts___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__polyfills_ts__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(475);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__environments_environment__ = __webpack_require__(516);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app___ = __webpack_require__(510);
+
+
+
+
+
+if (__WEBPACK_IMPORTED_MODULE_3__environments_environment__["a" /* environment */].production) {
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__angular_core__["enableProdMode"])();
+}
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__["a" /* platformBrowserDynamic */])().bootstrapModule(__WEBPACK_IMPORTED_MODULE_4__app___["a" /* AppModule */]);
+
+
+/***/ },
+/* 722 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shared_movie__ = __webpack_require__(209);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_movie_data_service__ = __webpack_require__(98);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_director__ = __webpack_require__(208);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_director_data_service__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__shared_actor__ = __webpack_require__(207);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__shared_actor_data_service__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__shared_movie_actor__ = __webpack_require__(724);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shared_movie_director__ = __webpack_require__(725);
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return MovieManageComponent; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+
+
+
+
+var MovieManageComponent = (function () {
+    function MovieManageComponent(router, route, movieDataService, directorDataService, actorDataService) {
+        this.router = router;
+        this.route = route;
+        this.movieDataService = movieDataService;
+        this.directorDataService = directorDataService;
+        this.actorDataService = actorDataService;
+        this.movie = new __WEBPACK_IMPORTED_MODULE_2__shared_movie__["a" /* Movie */]();
+        this.actors = [];
+        this.selectedActors = [];
+        this.directors = [];
+        this.selectedDirectors = [];
+        this.isError = false;
+        this.errorMessage = '';
+    }
+    MovieManageComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        var id = this.route.params.forEach(function (params) {
+            var id = +params['id'];
+            _this.movieDataService.getMovie(id).then(function (movie) { return _this.movie = movie; });
+            _this.movieDataService.getActorsByMovie(id).then(function (res) { _this.selectedActors = res; });
+            _this.movieDataService.getDirectorsByMovie(id).then(function (res) {
+                _this.selectedDirectors = res;
+            });
+        });
+        this.directorDataService.getDirectors().then(function (directors) { _this.directors = directors; });
+    };
+    MovieManageComponent.prototype.addActor = function (id) {
+        var _this = this;
+        var movieActor = new __WEBPACK_IMPORTED_MODULE_8__shared_movie_actor__["a" /* MovieActor */]();
+        movieActor.movie_id = this.movie.movie_id;
+        movieActor.actor_id = id;
+        var actor = new __WEBPACK_IMPORTED_MODULE_6__shared_actor__["a" /* Actor */]();
+        this.movieDataService.postAssociateMovieActor(movieActor).then(function (res) {
+            _this.actorDataService.getActor(movieActor.actor_id).then(function (res) {
+                actor = res;
+                _this.selectedActors.push(actor);
+            });
+        }).catch(function (error) { return _this.error = error; });
+    };
+    MovieManageComponent.prototype.callType = function (value) {
+        console.log(value);
+        // this.order.type=value;
+    };
+    MovieManageComponent.prototype.removeActor = function (id) {
+        var _this = this;
+        var actor = new __WEBPACK_IMPORTED_MODULE_6__shared_actor__["a" /* Actor */]();
+        this.movieDataService.putDisAssociateMovieActor(this.movie.movie_id, id).then(function (res) {
+            _this.actorDataService.getActor(id).then(function (res) {
+                actor = res;
+                var index = _this.selectedActors.indexOf(actor);
+                if (index !== -1) {
+                    _this.selectedActors.splice(index, 1);
+                }
+            });
+        }).catch(function (error) { return _this.error = error; });
+    };
+    MovieManageComponent.prototype.addDirector = function (id) {
+        var _this = this;
+        var movieDirector = new __WEBPACK_IMPORTED_MODULE_9__shared_movie_director__["a" /* MovieDirector */]();
+        movieDirector.movie_id = this.movie.movie_id;
+        movieDirector.director_id = id;
+        var director = new __WEBPACK_IMPORTED_MODULE_4__shared_director__["a" /* Director */]();
+        this.movieDataService.postAssociateMovieDirector(movieDirector).then(function (res) {
+            _this.directorDataService.getDirector(movieDirector.director_id).then(function (res) {
+                director = res;
+                _this.selectedDirectors.push(director);
+            });
+        }).catch(function (error) { return _this.error = error; });
+    };
+    MovieManageComponent.prototype.removeDirector = function (id) {
+        var _this = this;
+        var director = new __WEBPACK_IMPORTED_MODULE_4__shared_director__["a" /* Director */]();
+        this.movieDataService.putDisAssociateMovieActor(this.movie.movie_id, id).then(function (res) {
+            _this.directorDataService.getDirector(id).then(function (res) {
+                director = res;
+                var index = _this.selectedDirectors.indexOf(director);
+                if (index !== -1) {
+                    _this.selectedDirectors.splice(index, 1);
+                }
+            });
+        }).catch(function (error) { return _this.error = error; });
+    };
+    MovieManageComponent.prototype.saveMovie = function () {
+        var _this = this;
+        this.isError = false;
+        if (this.movie.name == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid title for the Movie.";
+        }
+        if (this.movie.description == null) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid description for the Movie.";
+        }
+        if (this.movie.year == null || !Number(this.movie.year) || this.movie.year < 1800 || this.movie.year > 2017) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid Year for the Movie (1800-2017).";
+        }
+        if (this.movie.rating == null || !Number(this.movie.rating) || this.movie.rating < 1 || this.movie.rating > 5) {
+            this.isError = true;
+            this.errorMessage = "Please provide a valid Rating for the Movie (1-5).";
+        }
+        if (!this.isError) {
+            this.movieDataService.save(this.movie).then(function (res) {
+                _this.router.navigate(['/movies']);
+            }).catch(function (error) { return _this.error = error; });
+        }
+    };
+    MovieManageComponent = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+            template: __webpack_require__(723)
+        }), 
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* Router */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* Router */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* ActivatedRoute */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* ActivatedRoute */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__shared_movie_data_service__["a" /* MovieDataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__shared_movie_data_service__["a" /* MovieDataService */]) === 'function' && _c) || Object, (typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_5__shared_director_data_service__["a" /* DirectorDataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_5__shared_director_data_service__["a" /* DirectorDataService */]) === 'function' && _d) || Object, (typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_7__shared_actor_data_service__["a" /* ActorDataService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_7__shared_actor_data_service__["a" /* ActorDataService */]) === 'function' && _e) || Object])
+    ], MovieManageComponent);
+    return MovieManageComponent;
+    var _a, _b, _c, _d, _e;
+}());
+
+
+/***/ },
+/* 723 */
+/***/ function(module, exports) {
+
+module.exports = "<br/>\r\n<h3>Manage Movie Associations</h3>\r\n<div class=\"form-group\">\r\n<div *ngIf=\"isError\" style=\"text-align:left;padding-left:10px;font-size:14px;color:red;\"> {{errorMessage}} </div>\r\n</div>\r\n\r\n<div class=\"form-group\">\r\n  <label for=\"title\">Movie Name</label> : &nbsp;&nbsp;\r\n  <label style=\"font-size:20px;font-weight:bold\">{{movie.name}} </label>\r\n</div>\r\n\r\n<h5> Actor Associations</h5>\r\n<div class=\"row\">\r\n<div class=\"form-group\">\r\n  <div class=\"col-md-6\"> \r\n      <table width=\"80%\">\r\n        <tr *ngFor=\"let actor of selectedActors\">\r\n          <td>{{actor.name}}</td>\r\n          </tr>\r\n      </table>\r\n  </div>\r\n</div>\r\n</div>\r\n<br />\r\n<h5> Director Associations</h5>\r\n<div class=\"row\">\r\n<div class=\"form-group\">\r\n  <div class=\"col-md-6\"> \r\n      <table width=\"80%\">\r\n        <tr *ngFor=\"let director of selectedDirectors\">\r\n          <td>{{director.name}}</td>\r\n          </tr>\r\n      </table>\r\n  </div>\r\n</div>\r\n</div>"
+
+/***/ },
+/* 724 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return MovieActor; });
+var MovieActor = (function () {
+    function MovieActor() {
+    }
+    return MovieActor;
+}());
+
+
+/***/ },
+/* 725 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(exports, "a", function() { return MovieDirector; });
+var MovieDirector = (function () {
+    function MovieDirector() {
+    }
+    return MovieDirector;
+}());
 
 
 /***/ }
