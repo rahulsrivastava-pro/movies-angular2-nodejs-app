@@ -1,4 +1,4 @@
-# Movies-App using Angular2, Node, Express and Mongo  [![MIT license](http://img.shields.io/badge/license-MIT-lightgrey.svg)](http://opensource.org/licenses/MIT)
+# Movies-App using Angular2, Node, Express and Mongo  
 
 
 The front-end of this project was generated with [Angular CLI](https://github.com/angular/angular-cli).
@@ -29,7 +29,7 @@ Please visit the repository for end to end project implementation.
 1. Delete all files from 'dist' folder.
 2. Command window 1: `ng build -w`: build the project and keep watching the files for changes
 3. Command window 2: `npm start`: run Express server
-4. Go to [localhost:8080](http://localhost:8000)
+4. Go to [localhost:8000](http://localhost:8000)
 5. Database for the application is placed on Mongo-lab. In order to connect to it, use the following connection settings from any local mongo db client (like RoboMongo):
    `Database: ds161640.mlab.com`,
    `Port: 61640`,
