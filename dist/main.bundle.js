@@ -13088,7 +13088,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ActorDataService = (function () {
     function ActorDataService(http) {
         this.http = http;
-        this.actorsUrl = 'http://localhost:8080/api/actor';
+        this.actorsUrl = 'https://heroku-node-movies-api.herokuapp.com/api/actor';
+        //private actorsUrl = 'http://localhost:8080/api/actor';
         this.user = new __WEBPACK_IMPORTED_MODULE_3__user__["a" /* User */]();
     }
     ActorDataService.prototype.getActors = function () {
@@ -13172,7 +13173,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var DirectorDataService = (function () {
     function DirectorDataService(http) {
         this.http = http;
-        this.directorsUrl = 'http://localhost:8080/api/director';
+        this.directorsUrl = 'https://heroku-node-movies-api.herokuapp.com/api/director';
+        //private directorsUrl = 'http://localhost:8080/api/director';
         this.user = new __WEBPACK_IMPORTED_MODULE_3__user__["a" /* User */]();
     }
     DirectorDataService.prototype.getDirectors = function () {
@@ -13256,7 +13258,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var MovieDataService = (function () {
     function MovieDataService(http) {
         this.http = http;
-        this.baseURL = 'http://localhost:8080/api/';
+        this.baseURL = 'https://heroku-node-movies-api.herokuapp.com/api/';
+        //private baseURL = 'http://localhost:8080/api/';
         this.authUrl = this.baseURL + 'authenticate';
         this.moviesUrl = this.baseURL + 'movie';
         this.getActorsInMovieUrl = this.baseURL + 'getActorsInMovie';
@@ -61870,7 +61873,7 @@ module.exports = "<br>\r\n<h4>Actors Dashboard</h4>\r\n<br>\r\n\r\n<table class=
 /* 687 */
 /***/ function(module, exports) {
 
-module.exports = "<div class=\"container\">\r\n\r\n  <nav class=\"navbar navbar-dark bg-inverse nav-head\">\r\n    <div class=\"nav navbar-nav\" style=\"float:left\"> <img src=\"/assets/movie.jpg\" alt=\"\" height=\"40px\" width=\"50px\"> <span class=\"heading\">Movies App</span> </div> \r\n    <div class=\"nav navbar-nav\" style=\"float:right\">\r\n        <a routerLink=\"/\" class=\"nav-item nav-link\" routerLinkActive=\"active\" [routerLinkActiveOptions]=\"{exact:true}\">\r\n          <i class=\"fa fa-list\"></i> <span class=\"hidden-xs-down\">Movies</span>\r\n        </a>\r\n        <a routerLink=\"/actors\" class=\"nav-item nav-link\" routerLinkActive=\"active\">\r\n            <i class=\"fa fa-user-o\"></i> <span class=\"hidden-xs-down\"> Actors </span>\r\n        </a>\r\n        <a routerLink=\"/directors\" class=\"nav-item nav-link\" routerLinkActive=\"active\">\r\n            <i class=\"fa fa-user\"></i> <span class=\"hidden-xs-down\"> Directors </span>\r\n        </a>\r\n    </div>\r\n  </nav>\r\n\r\n  <router-outlet></router-outlet>\r\n\r\n</div>"
+module.exports = "<div class=\"container\">\r\n\r\n  <nav class=\"navbar navbar-dark bg-inverse nav-head\">\r\n    <div class=\"nav navbar-nav\" style=\"float:left\"> <img src=\"/assets/movie.jpg\" alt=\"\" height=\"40px\" width=\"50px\"> <span class=\"heading\">Movies App</span> </div> \r\n    <div class=\"nav navbar-nav\" style=\"float:right\">\r\n        <a routerLink=\"/\" class=\"nav-item nav-link\" routerLinkActive=\"active\" [routerLinkActiveOptions]=\"{exact:true}\">\r\n          <i class=\"fa fa-list\"></i> <span class=\"hidden-xs-down\">Movies</span>\r\n        </a>\r\n        <a routerLink=\"/actors\" class=\"nav-item nav-link\" routerLinkActive=\"active\">\r\n            <i class=\"fa fa-user-o\"></i> <span class=\"hidden-xs-down\"> Actors </span>\r\n        </a>\r\n        <a routerLink=\"/directors\" class=\"nav-item nav-link\" routerLinkActive=\"active\">\r\n            <i class=\"fa fa-user\"></i> <span class=\"hidden-xs-down\"> Directors </span>\r\n        </a>\r\n    </div>\r\n  </nav>\r\n\r\n  <router-outlet></router-outlet>\r\n  <div align=\"center\"> Powered by <a href=\"https://github.com/rahul-openstack\"> Rahul Srivastava </a></div> \r\n</div>"
 
 /***/ },
 /* 688 */

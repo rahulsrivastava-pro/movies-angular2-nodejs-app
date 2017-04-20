@@ -14,7 +14,9 @@ import { User } from './user';
 @Injectable()
 export class MovieDataService {
 
-  private baseURL = 'http://localhost:8080/api/';
+  
+  private baseURL ='https://heroku-node-movies-api.herokuapp.com/api/';
+  //private baseURL = 'http://localhost:8080/api/';
 
   private authUrl = this.baseURL + 'authenticate';
   private moviesUrl = this.baseURL + 'movie';
